@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 // Authentication Routes
 Route::prefix('auth')->group(base_path('routes/api/auth.php'));
 
+// Common Routes (for all authenticated users)
+Route::group([], base_path('routes/api/common.php'));
+
 // Admin Routes
 Route::prefix('admin')->group(base_path('routes/api/admin.php'));
 

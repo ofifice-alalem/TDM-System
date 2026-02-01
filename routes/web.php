@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Web\AuthController;
+use App\Http\Controllers\Web\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,15 +16,26 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Authentication Routes
-Route::get('/login', [App\Http\Controllers\Web\AuthController::class, 'showLogin'])->name('login');
-Route::get('/register', [App\Http\Controllers\Web\AuthController::class, 'showRegister'])->name('register');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 
 // Redirect root to login
 Route::get('/', function () {
     return redirect('/login');
 });
 
-// Dashboard placeholder
-Route::get('/dashboard', function () {
-    return '<h1>Dashboard - قيد التطوير</h1><a href="/login">تسجيل الخروج</a>';
-})->name('dashboard');
+// Dashboard
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+// Marketer Routes
+Route::prefix('marketer')->group(function () {
+    Route::get('/requests', fn() => view('marketer.requests.index'));
+    Route::get('/requests/create', fn() => view('marketer.requests.create'));
+    Route::get('/requests/{id}', fn() => view('marketer.requests.show'));
+});
+
+// Warehouse Routes
+Route::prefix('warehouse')->group(function () {
+    Route::get('/requests', fn() => view('warehouse.requests.index'));
+    Route::get('/requests/{id}', fn() => view('warehouse.requests.show'));
+});

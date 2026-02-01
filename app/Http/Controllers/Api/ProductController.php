@@ -15,7 +15,6 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('mainStock')
-                          ->active()
                           ->paginate(15);
 
         return ProductResource::collection($products);

@@ -36,7 +36,7 @@
 
         async function loadProducts() {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE_URL}/admin/products`, {
+            const response = await fetch(`${API_BASE_URL}/products`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
