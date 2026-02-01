@@ -128,50 +128,90 @@
         color: white;
     }
 
-    .requests-table {
-        background: var(--card-light);
-        border-radius: 16px;
-        overflow: hidden;
-        border: 1px solid var(--border-light);
+    .requests-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
     }
 
-    body.dark-mode .requests-table {
+    .request-card {
+        background: var(--card-light);
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid var(--border-light);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.3s ease;
+    }
+
+    body.dark-mode .request-card {
         background: var(--card-dark);
         border-color: var(--border-dark);
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
+    .request-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
     }
 
-    thead {
+    .request-icon {
+        width: 56px;
+        height: 56px;
         background: rgba(139, 92, 246, 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
     }
 
-    th {
-        padding: 16px;
-        text-align: right;
+    .request-icon svg {
+        width: 28px;
+        height: 28px;
+        color: var(--primary);
+    }
+
+    .request-content {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .request-info {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .request-title {
+        font-size: 18px;
         font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 4px;
+    }
+
+    body.dark-mode .request-title { color: var(--text-dark); }
+
+    .request-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
         font-size: 14px;
-        color: var(--text-light);
+        color: #64748b;
     }
 
-    body.dark-mode th { color: var(--text-dark); }
-
-    td {
-        padding: 16px;
-        border-top: 1px solid var(--border-light);
-        color: var(--text-light);
+    .request-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
-    body.dark-mode td {
-        border-color: var(--border-dark);
-        color: var(--text-dark);
-    }
-
-    tbody tr:hover {
-        background: rgba(139, 92, 246, 0.05);
+    .request-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
     .status-badge {
@@ -256,28 +296,12 @@
     </div>
 </div>
 
-<div class="requests-table">
-    <table>
-        <thead>
-            <tr>
-                <th>رقم الفاتورة</th>
-                <th>التاريخ</th>
-                <th>الحالة</th>
-                <th>الإجراءات</th>
-            </tr>
-        </thead>
-        <tbody id="requestsBody">
-            <tr>
-                <td colspan="4">
-                    <div class="empty-state">
-                        <div class="empty-art">🔄</div>
-                        <h3>جاري تحميل البيانات</h3>
-                        <p>يرجى الانتظار قليلاً...</p>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+<div class="requests-list" id="requestsList">
+    <div class="empty-state">
+        <div class="empty-art">🔄</div>
+        <h3>جاري تحميل البيانات</h3>
+        <p>يرجى الانتظار قليلاً...</p>
+    </div>
 </div>
 @endsection
 
@@ -309,7 +333,7 @@
     }
 
     function renderRequests() {
-        const tbody = document.getElementById('requestsBody');
+        const container = document.getElementById('requestsList');
         const searchValue = document.getElementById('searchInput').value;
         
         let filtered = allRequests.filter(req => {
@@ -319,27 +343,51 @@
         });
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-art">📦</div><h3>لا توجد طلبات</h3><p>لم يتم العثور على أي طلبات</p></div></td></tr>`;
+            container.innerHTML = `<div class="empty-state"><div class="empty-art">📦</div><h3>لا توجد طلبات</h3><p>لم يتم العثور على أي طلبات</p></div>`;
             return;
         }
 
-        tbody.innerHTML = filtered.map(req => {
+        container.innerHTML = filtered.map(req => {
             const statusMap = {
-                'pending': { label: 'قيد الانتظار', class: 'status-pending' },
-                'approved': { label: 'موافق عليه', class: 'status-approved' },
-                'documented': { label: 'موثق', class: 'status-documented' },
-                'rejected': { label: 'مرفوض', class: 'status-rejected' },
-                'cancelled': { label: 'ملغي', class: 'status-cancelled' }
+                'pending': { label: 'قيد الانتظار', class: 'status-pending', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>' },
+                'approved': { label: 'موافق عليه', class: 'status-approved', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>' },
+                'documented': { label: 'موثق', class: 'status-documented', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>' },
+                'rejected': { label: 'مرفوض', class: 'status-rejected', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>' },
+                'cancelled': { label: 'ملغي', class: 'status-cancelled', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>' }
             };
-            const status = statusMap[req.status] || { label: req.status, class: '' };
-            const date = new Date(req.created_at).toLocaleDateString('ar-EG');
+            const status = statusMap[req.status] || { label: req.status, class: '', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>' };
+            const date = new Date(req.created_at).toLocaleDateString('en-CA');
+            const time = new Date(req.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
 
-            return `<tr><td><strong>${req.invoice_number}</strong></td><td>${date}</td><td><span class="status-badge ${status.class}">${status.label}</span></td><td><a href="/marketer/requests/${req.id}" class="btn-view">عرض التفاصيل</a></td></tr>`;
+            return `
+                <div class="request-card">
+                    <div class="request-icon">${status.icon}</div>
+                    <div class="request-content">
+                        <div class="request-info">
+                            <div class="request-title">${req.invoice_number}</div>
+                            <div class="request-meta">
+                                <span class="request-meta-item">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                    ${date}
+                                </span>
+                                <span class="request-meta-item">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    ${time}
+                                </span>
+                                <span class="status-badge ${status.class}">${status.label}</span>
+                            </div>
+                        </div>
+                        <div class="request-actions">
+                            <a href="/marketer/requests/${req.id}" class="btn-view">عرض التفاصيل</a>
+                        </div>
+                    </div>
+                </div>
+            `;
         }).join('');
     }
 
     function showError() {
-        document.getElementById('requestsBody').innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-art">⚠️</div><h3>حدث خطأ</h3><p>تعذر تحميل البيانات</p></div></td></tr>`;
+        document.getElementById('requestsList').innerHTML = `<div class="empty-state"><div class="empty-art">⚠️</div><h3>حدث خطأ</h3><p>تعذر تحميل البيانات</p></div>`;
     }
 
     document.getElementById('searchInput').addEventListener('input', () => {

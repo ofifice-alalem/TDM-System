@@ -39,9 +39,12 @@
         font-size: 18px;
         font-weight: 700;
         color: var(--text-light);
-        margin-bottom: 20px;
+        margin-bottom: 24px;
         padding-bottom: 12px;
         border-bottom: 2px solid var(--border-light);
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
     body.dark-mode .form-section-title {
@@ -58,11 +61,12 @@
         grid-template-columns: 1fr 150px 80px;
         gap: 16px;
         align-items: center;
-        padding: 16px;
+        padding: 20px;
         background: var(--bg-light);
         border-radius: 12px;
         margin-bottom: 12px;
         border: 1px solid var(--border-light);
+        transition: all 0.3s ease;
     }
 
     body.dark-mode .product-item {
@@ -70,16 +74,22 @@
         border-color: var(--border-dark);
     }
 
+    .product-item:hover {
+        border-color: var(--primary);
+        box-shadow: 0 2px 8px rgba(139, 92, 246, 0.1);
+    }
+
     .product-item select,
     .product-item input {
         width: 100%;
-        padding: 10px 16px;
+        padding: 12px 16px;
         border-radius: 8px;
         border: 1px solid var(--border-light);
         background: var(--card-light);
         color: var(--text-light);
         font-size: 14px;
         font-family: 'Tajawal', sans-serif;
+        transition: all 0.3s ease;
     }
 
     body.dark-mode .product-item select,
@@ -89,6 +99,13 @@
         color: var(--text-dark);
     }
 
+    .product-item select:focus,
+    .product-item input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+
     .btn-remove {
         padding: 10px;
         background: rgba(239, 68, 68, 0.1);
@@ -96,12 +113,19 @@
         border: none;
         border-radius: 8px;
         cursor: pointer;
-        font-size: 18px;
         transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .btn-remove:hover {
         background: rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-remove svg {
+        width: 18px;
+        height: 18px;
     }
 
     .btn-add-product {
@@ -198,7 +222,10 @@
 <div id="alertContainer"></div>
 
 <div class="form-card">
-    <h2 class="form-section-title">المنتجات المطلوبة</h2>
+    <h2 class="form-section-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        المنتجات المطلوبة
+    </h2>
     
     <div class="products-list" id="productsList"></div>
     
@@ -255,14 +282,30 @@
         row.className = 'product-item';
         row.id = `product-row-${id}`;
         row.innerHTML = `
-            <select class="product-select" data-id="${id}">
+            <select class="product-select" data-id="${id}" onchange="updateMaxQuantity(${id})">
                 <option value="">اختر المنتج</option>
                 ${products.map(p => `<option value="${p.id}" data-stock="${p.stock_quantity}">${p.name} - ${p.current_price} دينار (متوفر: ${p.stock_quantity})</option>`).join('')}
             </select>
-            <input type="number" class="quantity-input" data-id="${id}" placeholder="الكمية" min="1" value="1">
-            <button type="button" class="btn-remove" onclick="removeProductRow(${id})">🗑️</button>
+            <input type="number" class="quantity-input" data-id="${id}" placeholder="الكمية" min="1" max="" value="1">
+            <button type="button" class="btn-remove" onclick="removeProductRow(${id})">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </button>
         `;
         productsList.appendChild(row);
+    }
+
+    function updateMaxQuantity(id) {
+        const select = document.querySelector(`.product-select[data-id="${id}"]`);
+        const input = document.querySelector(`.quantity-input[data-id="${id}"]`);
+        const selectedOption = select.options[select.selectedIndex];
+        
+        if (selectedOption && selectedOption.value) {
+            const maxStock = parseInt(selectedOption.getAttribute('data-stock')) || 0;
+            input.setAttribute('max', maxStock);
+            if (parseInt(input.value) > maxStock) {
+                input.value = maxStock;
+            }
+        }
     }
 
     function removeProductRow(id) {
@@ -281,8 +324,13 @@
             if (productSelect && quantityInput) {
                 const productId = productSelect.value;
                 const quantity = parseInt(quantityInput.value);
+                const maxStock = parseInt(quantityInput.getAttribute('max'));
                 
                 if (productId && quantity > 0) {
+                    if (maxStock && quantity > maxStock) {
+                        showAlert(`الكمية المطلوبة أكبر من المتوفر في المخزن (الحد الأقصى: ${maxStock})`, 'error');
+                        return;
+                    }
                     items.push({ product_id: productId, quantity });
                 }
             }

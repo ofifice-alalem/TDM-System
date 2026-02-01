@@ -36,4 +36,5 @@ Route::middleware(['auth'])->prefix('marketer')->group(function () {
     Route::get('/requests', [App\Http\Controllers\Web\Marketer\RequestController::class, 'index']);
     Route::get('/requests/create', [App\Http\Controllers\Web\Marketer\RequestController::class, 'create']);
     Route::get('/requests/{id}', [App\Http\Controllers\Web\Marketer\RequestController::class, 'show']);
+    Route::get('/requests/{id}/print', [App\Http\Controllers\Web\Marketer\RequestController::class, 'print'])->name('marketer.requests.print');
 });
