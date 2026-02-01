@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Warehouse\RequestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -10,9 +11,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'role:warehouse_keeper'])->group(function () {
     
-    // Future: Warehouse Operations
-    // GET    /api/warehouse/requests
-    // PUT    /api/warehouse/requests/{id}/approve
-    // POST   /api/warehouse/requests/{id}/document
+    // Warehouse Operations - Marketer Requests
+    Route::get('/requests', [RequestController::class, 'index']);
+    Route::get('/requests/{id}', [RequestController::class, 'show']);
+    Route::put('/requests/{id}/approve', [RequestController::class, 'approve']);
+    Route::put('/requests/{id}/reject', [RequestController::class, 'reject']);
+    Route::post('/requests/{id}/document', [RequestController::class, 'document']);
     
 });
