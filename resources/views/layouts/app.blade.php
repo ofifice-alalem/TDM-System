@@ -4,30 +4,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'نظام إدارة التوزيع')</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     @stack('styles')
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-white shadow-lg">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-blue-600">نظام إدارة التوزيع</h1>
-            <div class="flex items-center gap-4">
-                <span id="user-name" class="text-gray-700"></span>
-                <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">تسجيل الخروج</button>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <i data-lucide="zap"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>تقنية</h1>
+                    <p>نظام إدارة التوزيع</p>
+                </div>
             </div>
-        </div>
-    </nav>
 
-    @yield('content')
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
+                    <span>لوحة التحكم</span>
+                    <i data-lucide="layout-dashboard"></i>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>المخزن الرئيسي</span>
+                    <i data-lucide="package"></i>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>فواتير المصنع</span>
+                    <i data-lucide="file-text"></i>
+                </a>
+                <a href="/marketer/requests" class="nav-item {{ Request::is('marketer/requests*') ? 'active' : '' }}">
+                    <span>طلبات المسوقين</span>
+                    <i data-lucide="clipboard-list"></i>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>توثيق البيع</span>
+                    <i data-lucide="check-square"></i>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>توثيق إيصالات القبض</span>
+                    <i data-lucide="file-check"></i>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>طلبات الإرجاع</span>
+                    <i data-lucide="rotate-ccw"></i>
+                </a>
+                <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <a href="#" class="nav-item">
+                        <span>الإعدادات</span>
+                        <i data-lucide="settings"></i>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p class="keeper-badge">KEEPER</p>
+                <p class="version-text">Taqnia Distribution 2024 ©</p>
+                <p class="version-text">V 2.5.0</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <div class="icon-btn theme-toggle">
+                        <i data-lucide="moon"></i>
+                    </div>
+                    <div class="icon-btn">
+                        <i data-lucide="bell"></i>
+                    </div>
+                    <div class="icon-btn">
+                        <i data-lucide="sparkles"></i>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <div class="user-profile">
+                        <div class="user-info">
+                            <h4 id="user-display-name">جاري التحميل...</h4>
+                            <p id="user-display-role">المستخدم</p>
+                        </div>
+                        <div class="user-avatar" id="user-avatar-initials">
+                            <i data-lucide="user"></i>
+                        </div>
+                        <div class="icon-btn logout-btn" onclick="logout()" title="تسجيل الخروج" style="margin-right: 12px; border-right: 1px solid var(--border-color); padding-right: 12px; border-radius: 0;">
+                            <i data-lucide="log-out"></i>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                @yield('content')
+            </div>
+        </main>
+    </div>
 
     <script>
         const API_BASE_URL = 'http://127.0.0.1:8000/api';
         
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Theme Management
+        const ThemeManager = {
+            init() {
+                this.loadTheme();
+                this.bindEvents();
+            },
+            loadTheme() {
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            },
+            toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            },
+            bindEvents() {
+                document.querySelector('.theme-toggle')?.addEventListener('click', () => this.toggleTheme());
+            }
+        };
+
         function logout() {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.href = '/';
         }
+
+        // Update user info from localStorage
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user) {
+            document.getElementById('user-display-name').textContent = user.full_name;
+        }
+        
+        // Initialize theme
+        ThemeManager.init();
     </script>
     @stack('scripts')
 </body>
