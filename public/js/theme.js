@@ -1,21 +1,3 @@
-// API Configuration
-const API_CONFIG = {
-    BASE_URL: 'http://127.0.0.1:8000',
-    API_PREFIX: '/api',
-    
-    // API Endpoints - Phase 1: Auth Only
-    AUTH: {
-        LOGIN: '/auth/login',
-        LOGOUT: '/auth/logout',
-        USER: '/auth/user'
-    }
-};
-
-// Helper function to build full API URL
-function apiUrl(endpoint) {
-    return API_CONFIG.BASE_URL + API_CONFIG.API_PREFIX + endpoint;
-}
-
 // Theme Management
 const ThemeManager = {
     init() {
@@ -39,7 +21,10 @@ const ThemeManager = {
     },
 
     updateToggleIcon(theme) {
-        // No icons needed as requested
+        const toggleBtn = document.querySelector('.theme-toggle');
+        if (toggleBtn) {
+            toggleBtn.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+        }
     },
 
     bindEvents() {
@@ -50,13 +35,6 @@ const ThemeManager = {
         });
     }
 };
-
-// Quick Login Functions
-function quickLogin(username, password) {
-    document.getElementById('username').value = username;
-    document.getElementById('password').value = password;
-    document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-}
 
 // Initialize theme on page load
 document.addEventListener('DOMContentLoaded', () => {
