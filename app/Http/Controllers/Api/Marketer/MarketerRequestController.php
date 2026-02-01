@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Marketer;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MarketerRequestController extends Controller
 {
@@ -13,10 +14,14 @@ class MarketerRequestController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO: Implementation
+        $requests = DB::table('marketer_requests')
+            ->where('marketer_id', $request->user()->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return response()->json([
             'message' => 'قائمة طلبات المسوق',
-            'data' => []
+            'data' => $requests
         ]);
     }
 

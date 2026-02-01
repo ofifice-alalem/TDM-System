@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Warehouse;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class WarehouseRequestController extends Controller
 {
@@ -13,10 +14,15 @@ class WarehouseRequestController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO: Implementation
+        $requests = DB::table('marketer_requests')
+            ->join('users', 'marketer_requests.marketer_id', '=', 'users.id')
+            ->select('marketer_requests.*', 'users.full_name as marketer_name')
+            ->orderBy('marketer_requests.created_at', 'desc')
+            ->get();
+
         return response()->json([
             'message' => 'قائمة طلبات المسوقين',
-            'data' => []
+            'data' => $requests
         ]);
     }
 

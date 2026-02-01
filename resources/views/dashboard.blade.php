@@ -10,15 +10,16 @@
     <p>Token: <code>{{ $token }}</code></p>
     <hr>
     <h3>اختبار API:</h3>
-    <button onclick="testAPI()">اختبار /api/marketer/requests</button>
+    <button onclick="testAPI('/api/marketer/requests')">اختبار /api/marketer/requests</button>
+    <button onclick="testAPI('/api/warehouse/requests')">اختبار /api/warehouse/requests</button>
     <pre id="result"></pre>
     
     <script>
         const token = '{{ $token }}';
         
-        async function testAPI() {
+        async function testAPI(url) {
             try {
-                const response = await fetch('/api/marketer/requests', {
+                const response = await fetch(url, {
                     headers: {
                         'Authorization': 'Bearer ' + token,
                         'Accept': 'application/json'
@@ -26,11 +27,11 @@
                 });
                 
                 const text = await response.text();
-                document.getElementById('result').textContent = text;
+                document.getElementById('result').textContent = 'اختبار ' + url + '\n' + text;
                 
                 if (response.headers.get('content-type')?.includes('application/json')) {
                     const data = JSON.parse(text);
-                    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+                    document.getElementById('result').textContent = 'اختبار ' + url + '\n' + JSON.stringify(data, null, 2);
                 }
             } catch (error) {
                 document.getElementById('result').textContent = 'Error: ' + error.message;
