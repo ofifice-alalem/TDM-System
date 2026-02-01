@@ -4,8 +4,21 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>طلب بضاعة</title>
     <style>
+        @font-face {
+            font-family: 'Cairo';
+            src: url('{{ public_path("fonts/Cairo-Regular.ttf") }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Cairo';
+            src: url('{{ public_path("fonts/Cairo-Regular.ttf") }}') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+        }
         @page { margin: 15px; }
-        body { font-family: 'DejaVu Sans'; color: #333; font-size: 12px; margin: 0; }
+        * { font-family: 'Cairo', 'DejaVu Sans', sans-serif; }
+        body { font-family: 'Cairo', 'DejaVu Sans', sans-serif; color: #333; font-size: 12px; margin: 0; }
         .header { margin-bottom: 15px; background-color: #333; color: white; padding: 12px; border-radius: 6px; display: table; width: 100%; }
         .header-right { display: table-cell; text-align: right; width: 50%; vertical-align: middle; }
         .header-left { display: table-cell; text-align: left; width: 50%; vertical-align: middle; }
@@ -20,8 +33,6 @@
         tr:nth-child(even) td { background-color: #f5f5f5; }
         .signatures { position: fixed; bottom: 15px; left: 15px; right: 15px; }
         .signature-box { display: inline-block; width: 45%; text-align: center; border-top: 1px solid #000; padding-top: 30px; margin: 0 2%; font-size: 10px; }
-        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-        .status-approved { background-color: #d1fae5; color: #065f46; }
     </style>
 </head>
 <body>
