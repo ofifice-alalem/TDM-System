@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,19 +14,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Authentication Routes
-Route::prefix('auth')->group(function () {
-    Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login']);
-    Route::post('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout'])->middleware('auth:sanctum');
-    Route::get('/user', [App\Http\Controllers\Api\AuthController::class, 'user'])->middleware('auth:sanctum');
-});
+Route::prefix('auth')->group(base_path('routes/api/auth.php'));
 
-// Protected API Routes
-Route::middleware('auth:sanctum')->group(function () {
-    
-    // Products Routes
-    Route::apiResource('products', App\Http\Controllers\Api\ProductController::class);
-    
-    // Stores Routes  
-    Route::apiResource('stores', App\Http\Controllers\Api\StoreController::class);
-    
-});
+// Admin Routes
+Route::prefix('admin')->group(base_path('routes/api/admin.php'));
+
+// Marketer Routes
+Route::prefix('marketer')->group(base_path('routes/api/marketer.php'));
+
+// Warehouse Routes
+Route::prefix('warehouse')->group(base_path('routes/api/warehouse.php'));
