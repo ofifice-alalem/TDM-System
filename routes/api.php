@@ -25,5 +25,5 @@ Route::prefix('marketer')->group(base_path('routes/api/marketer.php'));
 // Warehouse Routes
 Route::prefix('warehouse')->group(base_path('routes/api/warehouse.php'));
 
-// Common Routes
-Route::prefix('common')->group(base_path('routes/api/common.php'));
+// Common Routes (no prefix)
+require base_path('routes/api/common.php');

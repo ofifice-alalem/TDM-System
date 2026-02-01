@@ -29,3 +29,8 @@ Route::get('/dashboard', function () {
     $token = request()->user() ? request()->user()->createToken('web-token')->plainTextToken : null;
     return view('dashboard', ['token' => $token]);
 })->middleware('auth')->name('dashboard');
+
+// Marketer Routes
+Route::middleware(['auth'])->prefix('marketer')->group(function () {
+    Route::get('/stock', [App\Http\Controllers\Web\Marketer\StockController::class, 'index']);
+});
