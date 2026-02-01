@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Marketer\MarketerRequestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -10,10 +11,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'role:salesman'])->group(function () {
     
-    // Future: Marketer Requests, Sales, Returns, etc.
-    // GET    /api/marketer/requests
-    // POST   /api/marketer/requests
-    // GET    /api/marketer/sales
-    // POST   /api/marketer/sales
+    // ┌─────────────────────────────────────────────────────────────────┐
+    // │ Marketer Requests API - طلبات البضاعة من المسوق                │
+    // └─────────────────────────────────────────────────────────────────┘
+    Route::get('requests', [MarketerRequestController::class, 'index']);
+    Route::post('requests', [MarketerRequestController::class, 'store']);
+    Route::get('requests/{id}', [MarketerRequestController::class, 'show']);
+    Route::put('requests/{id}/cancel', [MarketerRequestController::class, 'cancel']);
     
 });

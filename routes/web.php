@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 // Authentication Routes
 Route::get('/login', [App\Http\Controllers\Web\AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [App\Http\Controllers\Web\AuthController::class, 'login']);
+Route::post('/logout', [App\Http\Controllers\Web\AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [App\Http\Controllers\Web\AuthController::class, 'showRegister'])->name('register');
 
 // Redirect root to login
@@ -24,5 +26,6 @@ Route::get('/', function () {
 
 // Dashboard placeholder
 Route::get('/dashboard', function () {
-    return '<h1>Dashboard - قيد التطوير</h1><a href="/login">تسجيل الخروج</a>';
-})->name('dashboard');
+    $token = request()->user() ? request()->user()->createToken('web-token')->plainTextToken : null;
+    return view('dashboard', ['token' => $token]);
+})->middleware('auth')->name('dashboard');

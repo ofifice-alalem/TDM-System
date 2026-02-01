@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>تسجيل الدخول - نظام إدارة التوزيع</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -111,6 +112,12 @@
     </div>
 
     <script>
+        function quickLogin(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+        }
+
         function togglePassword() {
             const input = document.getElementById('password');
             const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -129,7 +136,7 @@
             btn.disabled = true;
             
             try {
-                const response = await fetch(apiUrl(API_CONFIG.AUTH.LOGIN), {
+                const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -144,9 +151,19 @@
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     
-                    // Success animation or message
                     btn.textContent = 'تم بنجاح!';
                     btn.style.background = '#48bb78';
+                    
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                    const formData = new FormData();
+                    formData.append('username', username);
+                    formData.append('password', password);
+                    formData.append('_token', csrfToken);
+                    
+                    await fetch('/login', {
+                        method: 'POST',
+                        body: formData
+                    });
                     
                     setTimeout(() => {
                         window.location.href = '/dashboard';
