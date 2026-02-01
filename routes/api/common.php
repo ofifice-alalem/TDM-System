@@ -10,4 +10,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     Route::get('/stores', [StoreController::class, 'index']);
     Route::post('/stores', [StoreController::class, 'store']);
+    
+    Route::get('/warehouse/main-stock', function() {
+        $stock = \DB::table('main_stock')
+            ->select('product_id', 'quantity')
+            ->get();
+        return response()->json(['data' => $stock]);
+    });
 });

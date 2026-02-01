@@ -33,4 +33,7 @@ Route::get('/dashboard', function () {
 // Marketer Routes
 Route::middleware(['auth'])->prefix('marketer')->group(function () {
     Route::get('/stock', [App\Http\Controllers\Web\Marketer\StockController::class, 'index']);
+    Route::get('/requests', [App\Http\Controllers\Web\Marketer\RequestController::class, 'index']);
+    Route::get('/requests/create', [App\Http\Controllers\Web\Marketer\RequestController::class, 'create']);
+    Route::get('/requests/{id}', [App\Http\Controllers\Web\Marketer\RequestController::class, 'show']);
 });
