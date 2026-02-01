@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول - نظام إدارة التوزيع</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/config.js"></script>
 </head>
 <body class="bg-light">
     <div class="container">
@@ -47,7 +48,7 @@
             const password = document.getElementById('password').value;
             
             try {
-                const response = await fetch('/api/auth/login', {
+                const response = await fetch(apiUrl(API_CONFIG.AUTH.LOGIN), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -61,7 +62,8 @@
                 if (response.ok) {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    window.location.href = '/dashboard';
+                    alert('تم تسجيل الدخول بنجاح!');
+                    // window.location.href = '/dashboard';
                 } else {
                     document.getElementById('error-message').style.display = 'block';
                     document.getElementById('error-message').textContent = data.message || 'خطأ في تسجيل الدخول';

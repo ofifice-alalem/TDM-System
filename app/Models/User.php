@@ -41,6 +41,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the password attribute name.
+     */
+    public function getAuthPasswordName()
+    {
+        return 'password_hash';
+    }
+
+    /**
      * Get the role that owns the user.
      */
     public function role(): BelongsTo

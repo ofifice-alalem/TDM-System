@@ -30,7 +30,4 @@ Route::middleware('auth:sanctum')->group(function () {
     // Stores Routes  
     Route::apiResource('stores', App\Http\Controllers\Api\StoreController::class);
     
-    // Main Stock Routes
-    Route::get('stock/main', [App\Http\Controllers\Api\StockController::class, 'mainStock']);
-    
 });
