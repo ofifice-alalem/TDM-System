@@ -15,12 +15,30 @@ class RequestController extends Controller
 {
     public function index(Request $request)
     {
-        $requests = MarketerRequest::with(['items.product', 'approvedBy', 'rejectedBy', 'documentedBy'])
-            ->where('marketer_id', $request->user()->id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        try {
+            $requests = MarketerRequest::with(['items.product', 'marketer'])
+                ->where('marketer_id', $request->user()->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
 
-        return MarketerRequestResource::collection($requests);
+            return response()->json([
+                'data' => $requests->map(function($req) {
+                    return [
+                        'id' => $req->id,
+                        'invoice_number' => $req->invoice_number,
+                        'status' => $req->status,
+                        'notes' => $req->notes,
+                        'created_at' => $req->created_at->format('Y-m-d H:i:s'),
+                        'user' => [
+                            'full_name' => $req->marketer->full_name ?? 'Unknown'
+                        ],
+                        'items' => $req->items
+                    ];
+                })
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function store(Request $request)
@@ -62,7 +80,7 @@ class RequestController extends Controller
 
     public function show($id)
     {
-        $request = MarketerRequest::with(['items.product', 'approvedBy', 'rejectedBy', 'documentedBy'])
+        $request = MarketerRequest::with(['items.product', 'marketer', 'approvedBy', 'rejectedBy', 'documentedBy'])
             ->where('marketer_id', auth()->user()->id)
             ->findOrFail($id);
 

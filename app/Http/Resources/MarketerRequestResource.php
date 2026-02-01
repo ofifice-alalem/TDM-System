@@ -13,7 +13,10 @@ class MarketerRequestResource extends JsonResource
             'id' => $this->id,
             'invoice_number' => $this->invoice_number,
             'marketer_id' => $this->marketer_id,
-            'marketer_name' => $this->marketer->full_name,
+            'user' => [
+                'id' => $this->marketer?->id,
+                'full_name' => $this->marketer?->full_name,
+            ],
             'status' => $this->status,
             'notes' => $this->notes,
             'approved_by' => $this->approved_by,

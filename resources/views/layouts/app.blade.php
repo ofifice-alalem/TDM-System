@@ -30,34 +30,64 @@
                     <span>لوحة التحكم</span>
                     <i data-lucide="layout-dashboard"></i>
                 </a>
-                <a href="#" class="nav-item">
-                    <span>المخزن الرئيسي</span>
-                    <i data-lucide="package"></i>
-                </a>
-                <a href="#" class="nav-item">
-                    <span>فواتير المصنع</span>
-                    <i data-lucide="file-text"></i>
-                </a>
-                <a href="/marketer/requests" class="nav-item {{ Request::is('marketer/requests*') ? 'active' : '' }}">
-                    <span>طلبات المسوقين</span>
-                    <i data-lucide="clipboard-list"></i>
-                </a>
-                <a href="#" class="nav-item">
-                    <span>توثيق البيع</span>
-                    <i data-lucide="check-square"></i>
-                </a>
-                <a href="#" class="nav-item">
-                    <span>توثيق إيصالات القبض</span>
-                    <i data-lucide="file-check"></i>
-                </a>
-                <a href="#" class="nav-item">
-                    <span>طلبات الإرجاع</span>
-                    <i data-lucide="rotate-ccw"></i>
-                </a>
-                <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                    <a href="#" class="nav-item">
-                        <span>الإعدادات</span>
-                        <i data-lucide="settings"></i>
+
+                <!-- Admin Links -->
+                <div class="nav-section admin-only" style="display: none;">
+                    <a href="#" class="nav-item {{ Request::is('products*') ? 'active' : '' }}">
+                        <span>المنتجات</span>
+                        <i data-lucide="package"></i>
+                    </a>
+                    <a href="#" class="nav-item {{ Request::is('stores*') ? 'active' : '' }}">
+                        <span>المتاجر</span>
+                        <i data-lucide="store"></i>
+                    </a>
+                    <a href="#" class="nav-item {{ Request::is('users*') ? 'active' : '' }}">
+                        <span>المستخدمين</span>
+                        <i data-lucide="users"></i>
+                    </a>
+                    <a href="#" class="nav-item {{ Request::is('reports*') ? 'active' : '' }}">
+                        <span>التقارير</span>
+                        <i data-lucide="bar-chart-3"></i>
+                    </a>
+                </div>
+
+                <!-- Warehouse Keeper Links -->
+                <div class="nav-section warehouse-only" style="display: none;">
+                    <a href="/warehouse/requests" class="nav-item {{ Request::is('warehouse/requests*') ? 'active' : '' }}">
+                        <span>طلبات المسوقين</span>
+                        <i data-lucide="clipboard-list"></i>
+                    </a>
+                    <a href="#" class="nav-item {{ Request::is('warehouse/stock*') ? 'active' : '' }}">
+                        <span>المخزون الرئيسي</span>
+                        <i data-lucide="warehouse"></i>
+                    </a>
+                    <a href="#" class="nav-item {{ Request::is('warehouse/logs*') ? 'active' : '' }}">
+                        <span>سجل الحركات</span>
+                        <i data-lucide="file-text"></i>
+                    </a>
+                </div>
+
+                <!-- Salesman/Marketer Links -->
+                <div class="nav-section salesman-only" style="display: none;">
+                    <a href="/marketer/requests" class="nav-item {{ Request::is('marketer/requests*') ? 'active' : '' }}">
+                        <span>طلباتي</span>
+                        <i data-lucide="shopping-cart"></i>
+                    </a>
+                    <a href="/marketer/requests/create" class="nav-item {{ Request::is('marketer/requests/create') ? 'active' : '' }}">
+                        <span>طلب بضاعة جديد</span>
+                        <i data-lucide="plus-circle"></i>
+                    </a>
+                    <a href="#" class="nav-item {{ Request::is('marketer/sales*') ? 'active' : '' }}">
+                        <span>فواتير البيع</span>
+                        <i data-lucide="receipt"></i>
+                    </a>
+                    <a href="#" class="nav-item {{ Request::is('marketer/stock*') ? 'active' : '' }}">
+                        <span>مخزوني</span>
+                        <i data-lucide="box"></i>
+                    </a>
+                    <a href="#" class="nav-item {{ Request::is('marketer/commissions*') ? 'active' : '' }}">
+                        <span>عمولاتي</span>
+                        <i data-lucide="dollar-sign"></i>
                     </a>
                 </div>
             </nav>
@@ -139,10 +169,31 @@
             window.location.href = '/';
         }
 
-        // Update user info from localStorage
+        // Update user info and show role-based menu
         const user = JSON.parse(localStorage.getItem('user'));
         if (user) {
             document.getElementById('user-display-name').textContent = user.full_name;
+            document.getElementById('user-display-role').textContent = getRoleDisplayName(user.role);
+            
+            // Show menu items based on role
+            if (user.role === 'admin') {
+                document.querySelector('.admin-only').style.display = 'block';
+                document.querySelector('.warehouse-only').style.display = 'block';
+                document.querySelector('.salesman-only').style.display = 'block';
+            } else if (user.role === 'warehouse_keeper') {
+                document.querySelector('.warehouse-only').style.display = 'block';
+            } else if (user.role === 'salesman') {
+                document.querySelector('.salesman-only').style.display = 'block';
+            }
+        }
+
+        function getRoleDisplayName(role) {
+            const roles = {
+                'admin': 'مدير النظام',
+                'warehouse_keeper': 'أمين المخزن',
+                'salesman': 'مسوق'
+            };
+            return roles[role] || 'مستخدم';
         }
         
         // Initialize theme
