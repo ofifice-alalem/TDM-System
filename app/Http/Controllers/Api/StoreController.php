@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\StoreResource;
 use App\Models\Store;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,7 @@ class StoreController extends Controller
     {
         $stores = Store::active()->paginate(15);
 
-        return response()->json($stores);
+        return StoreResource::collection($stores);
     }
 
     /**
@@ -33,10 +34,10 @@ class StoreController extends Controller
 
         $store = Store::create($request->all());
 
-        return response()->json([
-            'message' => 'تم إنشاء المتجر بنجاح',
-            'store' => $store
-        ], 201);
+        return (new StoreResource($store))
+            ->additional(['message' => 'تم إنشاء المتجر بنجاح'])
+            ->response()
+            ->setStatusCode(201);
     }
 
     /**
@@ -44,7 +45,7 @@ class StoreController extends Controller
      */
     public function show(Store $store)
     {
-        return response()->json($store);
+        return new StoreResource($store);
     }
 
     /**
@@ -62,10 +63,8 @@ class StoreController extends Controller
 
         $store->update($request->all());
 
-        return response()->json([
-            'message' => 'تم تحديث المتجر بنجاح',
-            'store' => $store
-        ]);
+        return (new StoreResource($store))
+            ->additional(['message' => 'تم تحديث المتجر بنجاح']);
     }
 
     /**

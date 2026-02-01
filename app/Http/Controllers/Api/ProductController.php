@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -17,7 +18,7 @@ class ProductController extends Controller
                           ->active()
                           ->paginate(15);
 
-        return response()->json($products);
+        return ProductResource::collection($products);
     }
 
     /**
@@ -34,10 +35,10 @@ class ProductController extends Controller
 
         $product = Product::create($request->all());
 
-        return response()->json([
-            'message' => 'تم إنشاء المنتج بنجاح',
-            'product' => $product
-        ], 201);
+        return (new ProductResource($product))
+            ->additional(['message' => 'تم إنشاء المنتج بنجاح'])
+            ->response()
+            ->setStatusCode(201);
     }
 
     /**
@@ -45,7 +46,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return response()->json($product->load('mainStock'));
+        return new ProductResource($product->load('mainStock'));
     }
 
     /**
@@ -62,10 +63,8 @@ class ProductController extends Controller
 
         $product->update($request->all());
 
-        return response()->json([
-            'message' => 'تم تحديث المنتج بنجاح',
-            'product' => $product
-        ]);
+        return (new ProductResource($product))
+            ->additional(['message' => 'تم تحديث المنتج بنجاح']);
     }
 
     /**
