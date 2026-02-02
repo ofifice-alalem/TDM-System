@@ -91,6 +91,36 @@
                 <div class="info-value" id="commissionAmount" style="color: var(--primary);">-</div>
             </div>
         </div>
+
+        <div class="sidebar-info-card" id="approvalSection" style="display: none;">
+            <div class="sidebar-info-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                تم التوثيق
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">بواسطة</div>
+                <div class="info-value" id="approvedBy">-</div>
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">بتاريخ</div>
+                <div class="info-value" id="confirmedAt">-</div>
+            </div>
+        </div>
+
+        <div class="sidebar-info-card" id="rejectionSection" style="display: none; background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.1);">
+            <div class="sidebar-info-title" style="color: #ef4444;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                تم الرفض
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">بواسطة</div>
+                <div class="info-value" id="rejectedBy">-</div>
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">سبب الرفض</div>
+                <div class="info-value" id="rejectionNotes" style="font-size: 14px; line-height: 1.6; color: #ef4444;">-</div>
+            </div>
+        </div>
     </div>
 
     <div class="payment-content">
@@ -189,6 +219,19 @@
             document.getElementById('commissionSection').style.display = 'block';
             document.getElementById('commissionRate').textContent = `${parseFloat(commission.commission_rate)}%`;
             document.getElementById('commissionAmount').textContent = `${parseFloat(commission.commission_amount).toLocaleString()} دينار`;
+        }
+
+        if (payment.status === 'approved' && payment.confirmed_at) {
+            document.getElementById('approvalSection').style.display = 'block';
+            document.getElementById('approvedBy').textContent = payment.keeper_name || 'أمين المخزن';
+            const confDate = new Date(payment.confirmed_at);
+            document.getElementById('confirmedAt').textContent = confDate.toLocaleDateString('en-US').replace(/\//g, '-');
+        }
+
+        if (payment.status === 'rejected' && payment.notes) {
+            document.getElementById('rejectionSection').style.display = 'block';
+            document.getElementById('rejectedBy').textContent = payment.keeper_name || 'أمين المخزن';
+            document.getElementById('rejectionNotes').textContent = payment.notes;
         }
 
         renderActions(payment.status);
