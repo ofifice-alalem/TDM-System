@@ -51,6 +51,13 @@
     @keyframes fadeInRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.3; } 100% { opacity: 0.6; } }
     @media (max-width: 1200px) { .page-layout { flex-direction: column; } .actions-sidebar { position: static; width: 100%; } }
+    .image-modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.95); z-index: 10000; }
+    .image-modal-overlay.active { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    .image-modal-header { position: absolute; top: 20px; right: 20px; left: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10001; }
+    .image-modal-title { color: white; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .image-modal-close { padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; font-family: 'Tajawal', sans-serif; }
+    .image-modal-content { max-width: 85%; max-height: 80vh; }
+    .image-modal-content img { max-width: 100%; max-height: 80vh; border-radius: 16px; box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6); object-fit: contain; }
 </style>
 @endpush
 
@@ -70,11 +77,6 @@
         </h3>
         <div class="actions-container" id="actionsContainer">
             <div style="height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; animation: pulse 1.5s infinite;"></div>
-        </div>
-
-        <div class="amount-display">
-            <div class="amount-label">المبلغ المسدد</div>
-            <div class="amount-value" id="amountValue">0 ر.س</div>
         </div>
 
         <div class="sidebar-info-card" id="approvalSection" style="display: none;">
@@ -136,6 +138,10 @@
 
     <div class="payment-content">
         <div class="info-card">
+            <div class="amount-display" style="margin-top: 0; margin-bottom: 32px;">
+                <div class="amount-label">المبلغ المسدد</div>
+                <div class="amount-value" id="amountValue">0 ر.س</div>
+            </div>
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-label">
@@ -174,6 +180,22 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="image-modal-overlay" id="imageModal" onclick="if(event.target === this) closeImageModal()">
+    <div class="image-modal-header">
+        <div class="image-modal-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            صورة التوثيق
+        </div>
+        <button class="image-modal-close" onclick="closeImageModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            إغلاق
+        </button>
+    </div>
+    <div class="image-modal-content">
+        <img id="documentImage" src="" alt="صورة التوثيق">
     </div>
 </div>
 @endsection
@@ -250,10 +272,10 @@
             document.getElementById('rejectionNotes').textContent = payment.notes;
         }
 
-        renderActions(payment.status);
+        renderActions(payment.status, payment.receipt_image);
     }
 
-    function renderActions(status) {
+    function renderActions(status, receiptImage) {
         const container = document.getElementById('actionsContainer');
         let html = '';
 
@@ -266,6 +288,10 @@
             `;
         }
 
+        if (status === 'approved' && receiptImage) {
+            html += `<button class="btn" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;" onclick="viewDocument()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>عرض التوثيق</button>`;
+        }
+
         html += `
             <button class="btn btn-secondary" onclick="window.history.back()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"></path><polyline points="12 19 5 12 12 5"></polyline></svg>
@@ -274,6 +300,25 @@
         `;
 
         container.innerHTML = html;
+    }
+
+    async function viewDocument() {
+        try {
+            const response = await fetch(`/api/marketer/payments/${paymentId}`, {
+                headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+            });
+            const result = await response.json();
+            if (result.data && result.data.payment.receipt_image) {
+                document.getElementById('documentImage').src = result.data.payment.receipt_image;
+                document.getElementById('imageModal').classList.add('active');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function closeImageModal() {
+        document.getElementById('imageModal').classList.remove('active');
     }
 
     async function cancelPayment() {

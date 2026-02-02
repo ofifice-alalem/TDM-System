@@ -51,6 +51,13 @@
     @keyframes fadeInRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.3; } 100% { opacity: 0.6; } }
     @media (max-width: 1200px) { .page-layout { flex-direction: column; } .actions-sidebar { position: static; width: 100%; } }
+    .image-modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.95); z-index: 10000; }
+    .image-modal-overlay.active { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    .image-modal-header { position: absolute; top: 20px; right: 20px; left: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10001; }
+    .image-modal-title { color: white; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .image-modal-close { padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; font-family: 'Tajawal', sans-serif; }
+    .image-modal-content { max-width: 85%; max-height: 80vh; }
+    .image-modal-content img { max-width: 100%; max-height: 80vh; border-radius: 16px; box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6); object-fit: contain; }
 </style>
 @endpush
 
@@ -70,11 +77,6 @@
         </h3>
         <div class="actions-container" id="actionsContainer">
             <div style="height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; animation: pulse 1.5s infinite;"></div>
-        </div>
-
-        <div class="amount-display">
-            <div class="amount-label">المبلغ المسدد</div>
-            <div class="amount-value" id="amountValue">0 ر.س</div>
         </div>
 
         <div class="sidebar-info-card" id="commissionSection" style="display: none; background: rgba(139, 92, 246, 0.05); border-color: rgba(139, 92, 246, 0.1);">
@@ -125,6 +127,10 @@
 
     <div class="payment-content">
         <div class="info-card">
+            <div class="amount-display" style="margin-top: 0; margin-bottom: 32px;">
+                <div class="amount-label">المبلغ المسدد</div>
+                <div class="amount-value" id="amountValue">0 ر.س</div>
+            </div>
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-label">
@@ -163,6 +169,22 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="image-modal-overlay" id="imageModal" onclick="if(event.target === this) closeImageModal()">
+    <div class="image-modal-header">
+        <div class="image-modal-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            صورة التوثيق
+        </div>
+        <button class="image-modal-close" onclick="closeImageModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            إغلاق
+        </button>
+    </div>
+    <div class="image-modal-content">
+        <img id="documentImage" src="" alt="صورة التوثيق">
     </div>
 </div>
 @endsection
@@ -234,24 +256,47 @@
             document.getElementById('rejectionNotes').textContent = payment.notes;
         }
 
-        renderActions(payment.status);
+        renderActions(payment.status, payment.receipt_image);
     }
 
-    function renderActions(status) {
+    async function viewDocument() {
+        try {
+            const response = await fetch(`/api/warehouse/payments/${paymentId}`, {
+                headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+            });
+            const result = await response.json();
+            if (result.data && result.data.payment.receipt_image) {
+                document.getElementById('documentImage').src = result.data.payment.receipt_image;
+                document.getElementById('imageModal').classList.add('active');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function closeImageModal() {
+        document.getElementById('imageModal').classList.remove('active');
+    }
+
+    function renderActions(status, receiptImage) {
         const container = document.getElementById('actionsContainer');
         let html = '';
 
         if (status === 'pending') {
             html += `
-                <button class="btn btn-success" onclick="showApproveModal()">
+                <button class="btn btn-success" onclick="approvePayment()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                     توثيق الإيصال
                 </button>
-                <button class="btn btn-danger" onclick="showRejectModal()">
+                <button class="btn btn-danger" onclick="rejectPayment()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     رفض الإيصال
                 </button>
             `;
+        }
+
+        if (status === 'approved' && receiptImage) {
+            html += `<button class="btn" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;" onclick="viewDocument()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>عرض التوثيق</button>`;
         }
 
         html += `
@@ -264,60 +309,86 @@
         container.innerHTML = html;
     }
 
-    function showApproveModal() {
-        const modal = document.createElement('div');
-        modal.id = 'approveModal';
-        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;';
-        modal.innerHTML = `
-            <div style="background:var(--card-light);padding:32px;border-radius:16px;max-width:500px;width:90%;">
-                <h3 style="margin-bottom:20px;color:var(--text-light);">توثيق إيصال القبض</h3>
-                <input type="file" id="receiptImage" accept="image/*" style="width:100%;padding:12px;border:1px solid var(--border-light);border-radius:8px;margin-bottom:20px;">
-                <div style="display:flex;gap:12px;">
-                    <button onclick="approvePayment()" style="flex:1;padding:12px;background:var(--primary);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;">توثيق</button>
-                    <button onclick="closeApproveModal()" style="flex:1;padding:12px;background:#e2e8f0;color:#64748b;border:none;border-radius:8px;font-weight:700;cursor:pointer;">إلغاء</button>
+    let modalCallback = null;
+
+    function showModal(title, message, needsFile = false) {
+        return new Promise((resolve) => {
+            const modal = document.createElement('div');
+            modal.id = 'confirmModal';
+            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            
+            let content = '';
+            if (needsFile) {
+                content = `
+                    <div style="border:2px dashed #d1d5db;border-radius:12px;padding:40px 20px;text-align:center;margin-bottom:20px;background:#f9fafb;cursor:pointer;" onclick="document.getElementById('modalFileInput').click()">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        <div style="font-size:16px;font-weight:600;color:var(--text-light);margin-top:16px;" id="uploadText">رفع صورة الإيصال الموقع</div>
+                        <div style="font-size:13px;color:#9ca3af;margin-top:8px;">PNG, JPG تصل إلى 10MB</div>
+                        <input type="file" id="modalFileInput" accept="image/*" style="display:none;">
+                    </div>
+                `;
+            } else if (message === 'REJECT') {
+                content = `
+                    <p style="text-align:center;color:#64748b;margin-bottom:28px;">يرجى إدخال سبب الرفض:</p>
+                    <textarea id="rejectNotes" placeholder="اكتب السبب..." style="width:100%;padding:12px 16px;border-radius:12px;border:1px solid var(--border-light);background:var(--bg-light);color:var(--text-light);margin-bottom:20px;font-family:'Tajawal',sans-serif;font-size:14px;min-height:100px;"></textarea>
+                `;
+            } else {
+                content = `<p style="text-align:center;color:#64748b;margin-bottom:28px;">${message}</p>`;
+            }
+            
+            modal.innerHTML = `
+                <div style="background:var(--card-light);border-radius:20px;padding:32px;max-width:550px;width:90%;position:relative;">
+                    <button onclick="closeModal()" style="position:absolute;top:16px;left:16px;width:32px;height:32px;border:none;background:rgba(0,0,0,0.05);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                    <h3 style="font-size:22px;font-weight:700;text-align:center;margin-bottom:12px;color:var(--text-light);">${title}</h3>
+                    ${content}
+                    <div style="display:flex;gap:12px;">
+                        <button onclick="closeModal()" style="flex:1;padding:12px;border-radius:12px;font-weight:700;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;background:var(--bg-light);color:#64748b;border:1px solid var(--border-light);">إلغاء</button>
+                        <button onclick="confirmAction()" style="flex:1;padding:12px;border-radius:12px;font-weight:700;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;background:var(--primary);color:white;">تأكيد</button>
+                    </div>
                 </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
+            `;
+            document.body.appendChild(modal);
+            
+            if (needsFile) {
+                document.getElementById('modalFileInput').onchange = function() {
+                    if (this.files && this.files[0]) {
+                        document.getElementById('uploadText').innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-left:6px;"><polyline points="20 6 9 17 4 12"></polyline></svg> تمت معالجة الصورة';
+                        document.getElementById('uploadText').style.color = '#10b981';
+                    }
+                };
+            }
+            
+            modalCallback = resolve;
+        });
     }
 
-    function closeApproveModal() {
-        const modal = document.getElementById('approveModal');
+    function closeModal() {
+        const modal = document.getElementById('confirmModal');
         if (modal) modal.remove();
+        if (modalCallback) modalCallback(null);
     }
 
-    function showRejectModal() {
-        const modal = document.createElement('div');
-        modal.id = 'rejectModal';
-        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;';
-        modal.innerHTML = `
-            <div style="background:var(--card-light);padding:32px;border-radius:16px;max-width:500px;width:90%;">
-                <h3 style="margin-bottom:20px;color:var(--text-light);">رفض إيصال القبض</h3>
-                <textarea id="rejectNotes" placeholder="سبب الرفض..." style="width:100%;padding:12px;border:1px solid var(--border-light);border-radius:8px;margin-bottom:20px;min-height:100px;font-family:'Tajawal',sans-serif;"></textarea>
-                <div style="display:flex;gap:12px;">
-                    <button onclick="rejectPayment()" style="flex:1;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;">رفض</button>
-                    <button onclick="closeRejectModal()" style="flex:1;padding:12px;background:#e2e8f0;color:#64748b;border:none;border-radius:8px;font-weight:700;cursor:pointer;">إلغاء</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-    }
-
-    function closeRejectModal() {
-        const modal = document.getElementById('rejectModal');
+    function confirmAction() {
+        const fileInput = document.getElementById('modalFileInput');
+        const rejectNotes = document.getElementById('rejectNotes');
+        let value = true;
+        
+        if (fileInput && fileInput.files && fileInput.files[0]) value = fileInput.files[0];
+        else if (rejectNotes) value = rejectNotes.value;
+        
+        const modal = document.getElementById('confirmModal');
         if (modal) modal.remove();
+        if (modalCallback) modalCallback(value);
     }
 
     async function approvePayment() {
-        const fileInput = document.getElementById('receiptImage');
-        if (!fileInput.files[0]) {
-            return;
-        }
-
-        closeApproveModal();
+        const imageFile = await showModal('توثيق الإيصال', 'يرجى رفع صورة الإيصال المختوم', true);
+        if (!imageFile || imageFile === true) return;
 
         const formData = new FormData();
-        formData.append('receipt_image', fileInput.files[0]);
+        formData.append('receipt_image', imageFile);
 
         try {
             const response = await fetch(`/api/warehouse/payments/${paymentId}/approve`, {
@@ -327,20 +398,19 @@
             });
 
             if (response.ok) {
+                await showModal('نجح', 'تم توثيق الإيصال بنجاح');
                 window.location.reload();
+            } else {
+                await showModal('خطأ', 'فشل التوثيق');
             }
         } catch (error) {
-            console.error('Error:', error);
+            await showModal('خطأ', 'حدث خطأ');
         }
     }
 
     async function rejectPayment() {
-        const notes = document.getElementById('rejectNotes').value;
-        if (!notes) {
-            return;
-        }
-
-        closeRejectModal();
+        const notes = await showModal('رفض الإيصال', 'REJECT');
+        if (!notes || notes === true) return;
 
         try {
             const response = await fetch(`/api/warehouse/payments/${paymentId}/reject`, {
@@ -354,10 +424,13 @@
             });
 
             if (response.ok) {
+                await showModal('نجح', 'تم رفض الإيصال بنجاح');
                 window.location.reload();
+            } else {
+                await showModal('خطأ', 'فشل رفض الإيصال');
             }
         } catch (error) {
-            console.error('Error:', error);
+            await showModal('خطأ', 'حدث خطأ');
         }
     }
 
