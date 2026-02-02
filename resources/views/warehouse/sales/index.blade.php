@@ -79,7 +79,10 @@
 </div>
 
 <div class="invoices-list" id="invoicesList">
-    <div style="text-align: center; padding: 60px; color: #94a3b8;">جاري تحميل الفواتير...</div>
+    <div class="empty-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>
+        <h3>جاري تحميل الفواتير...</h3>
+    </div>
 </div>
 @endsection
 
@@ -124,7 +127,7 @@
         });
 
         if (filtered.length === 0) {
-            container.innerHTML = '<div style="text-align: center; padding: 60px; color: #94a3b8;">لا توجد فواتير</div>';
+            container.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg><h3>لا توجد فواتير</h3></div>';
             return;
         }
 
@@ -149,7 +152,7 @@
                         <div><span class="info-label">المبلغ</span><div class="info-value">${parseFloat(inv.total_amount).toFixed(2)} د</div></div>
                         <div class="status-badge ${status.class}">${status.icon.replace('width="24" height="24"', 'width="18" height="18"')} ${status.label}</div>
                     </div>
-                    <a href="/warehouse/sales/${inv.id}" class="btn-action">تفاصيل</a>
+                    <a href="/warehouse/sales/${inv.id}" class="btn-action">تفاصيل<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></a>
                 </div>
             `;
         }).join('');
