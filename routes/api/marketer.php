@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Marketer\MarketerRequestController;
 use App\Http\Controllers\Api\Marketer\MarketerReturnController;
+use App\Http\Controllers\Api\Marketer\MarketerSalesController;
 use App\Http\Controllers\Api\Marketer\StockController;
 
 /*
@@ -28,6 +29,14 @@ Route::middleware(['auth:sanctum', 'role:salesman'])->group(function () {
     Route::post('returns', [MarketerReturnController::class, 'store']);
     Route::get('returns/{id}', [MarketerReturnController::class, 'show']);
     Route::put('returns/{id}/cancel', [MarketerReturnController::class, 'cancel']);
+    
+    // ┌─────────────────────────────────────────────────────────────────┐
+    // │ Marketer Sales API - فواتير البيع من المسوق              │
+    // └─────────────────────────────────────────────────────────────────┘
+    Route::get('sales', [MarketerSalesController::class, 'index']);
+    Route::post('sales', [MarketerSalesController::class, 'store']);
+    Route::get('sales/{id}', [MarketerSalesController::class, 'show']);
+    Route::put('sales/{id}/cancel', [MarketerSalesController::class, 'cancel']);
     
     // ┌─────────────────────────────────────────────────────────────────┐
     // │ Marketer Stock API - مخزون المسوق                        │

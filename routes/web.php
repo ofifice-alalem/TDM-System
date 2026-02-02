@@ -42,6 +42,10 @@ Route::middleware(['auth'])->prefix('marketer')->group(function () {
     Route::get('/returns', [App\Http\Controllers\Web\Marketer\ReturnController::class, 'index']);
     Route::get('/returns/create', [App\Http\Controllers\Web\Marketer\ReturnController::class, 'create']);
     Route::get('/returns/{id}', [App\Http\Controllers\Web\Marketer\ReturnController::class, 'show']);
+    
+    Route::get('/sales', [App\Http\Controllers\Web\Marketer\SalesController::class, 'index']);
+    Route::get('/sales/create', [App\Http\Controllers\Web\Marketer\SalesController::class, 'create']);
+    Route::get('/sales/{id}', [App\Http\Controllers\Web\Marketer\SalesController::class, 'show']);
 });
 
 // Warehouse Routes
@@ -51,4 +55,7 @@ Route::middleware(['auth'])->prefix('warehouse')->group(function () {
     
     Route::get('/returns', [App\Http\Controllers\Web\Warehouse\ReturnController::class, 'index']);
     Route::get('/returns/{id}', [App\Http\Controllers\Web\Warehouse\ReturnController::class, 'show']);
+    
+    Route::get('/sales', [App\Http\Controllers\Web\Warehouse\SalesController::class, 'index']);
+    Route::get('/sales/{id}', [App\Http\Controllers\Web\Warehouse\SalesController::class, 'show']);
 });

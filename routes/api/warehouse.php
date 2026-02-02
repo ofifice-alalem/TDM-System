@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Warehouse\WarehouseRequestController;
 use App\Http\Controllers\Api\Warehouse\WarehouseReturnController;
+use App\Http\Controllers\Api\Warehouse\WarehouseSalesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,5 +31,11 @@ Route::middleware(['auth:sanctum', 'role:warehouse_keeper'])->group(function () 
     Route::put('returns/{id}/approve', [WarehouseReturnController::class, 'approve']);
     Route::put('returns/{id}/reject', [WarehouseReturnController::class, 'reject']);
     Route::post('returns/{id}/document', [WarehouseReturnController::class, 'document']);
+    // ┌─────────────────────────────────────────────────────────────────┐
+    // │ Warehouse Sales API - إدارة فواتير البيع              │
+    // └─────────────────────────────────────────────────────────────────┘
+    Route::get('sales', [WarehouseSalesController::class, 'index']);
+    Route::get('sales/{id}', [WarehouseSalesController::class, 'show']);
+    Route::post('sales/{id}/approve', [WarehouseSalesController::class, 'approve']);
     
 });

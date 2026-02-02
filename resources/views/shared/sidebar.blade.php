@@ -38,6 +38,12 @@
             </span>
             <span class="nav-label">إرجاع البضاعة</span>
         </a>
+        <a href="/marketer/sales" class="nav-link {{ request()->is('marketer/sales*') ? 'active' : '' }}">
+            <span class="nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            </span>
+            <span class="nav-label">فواتير البيع</span>
+        </a>
         @endif
 
         @if(auth()->user()->role->name === 'warehouse_keeper')
@@ -52,6 +58,12 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
             </span>
             <span class="nav-label">إرجاع البضاعة</span>
+        </a>
+        <a href="/warehouse/sales" class="nav-link {{ request()->is('warehouse/sales*') ? 'active' : '' }}">
+            <span class="nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            </span>
+            <span class="nav-label">فواتير البيع</span>
         </a>
         @endif
     </div>
