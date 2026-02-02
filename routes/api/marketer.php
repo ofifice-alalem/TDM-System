@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Marketer\MarketerRequestController;
 use App\Http\Controllers\Api\Marketer\MarketerReturnController;
 use App\Http\Controllers\Api\Marketer\MarketerSalesController;
+use App\Http\Controllers\Api\Marketer\MarketerPaymentController;
 use App\Http\Controllers\Api\Marketer\StockController;
 
 /*
@@ -38,6 +39,14 @@ Route::middleware(['auth:sanctum', 'role:salesman'])->group(function () {
     Route::get('sales/{id}', [MarketerSalesController::class, 'show']);
     Route::get('sales/{id}/rejection', [MarketerSalesController::class, 'getRejection']);
     Route::put('sales/{id}/cancel', [MarketerSalesController::class, 'cancel']);
+    
+    // ┌─────────────────────────────────────────────────────────────────┐
+    // │ Marketer Payments API - إيصالات القبض من المسوق              │
+    // └─────────────────────────────────────────────────────────────────┘
+    Route::get('payments', [MarketerPaymentController::class, 'index']);
+    Route::post('payments', [MarketerPaymentController::class, 'store']);
+    Route::get('payments/{id}', [MarketerPaymentController::class, 'show']);
+    Route::put('payments/{id}/cancel', [MarketerPaymentController::class, 'cancel']);
     
     // ┌─────────────────────────────────────────────────────────────────┐
     // │ Marketer Stock API - مخزون المسوق                        │

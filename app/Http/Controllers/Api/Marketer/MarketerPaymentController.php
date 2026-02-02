@@ -1,0 +1,118 @@
+<?php
+
+namespace App\Http\Controllers\Api\Marketer;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class MarketerPaymentController extends Controller
+{
+    public function index(Request $request)
+    {
+        $payments = DB::table('store_payments')
+            ->join('stores', 'store_payments.store_id', '=', 'stores.id')
+            ->where('store_payments.marketer_id', $request->user()->id)
+            ->select('store_payments.*', 'stores.name as store_name')
+            ->orderBy('store_payments.created_at', 'desc')
+            ->get();
+
+        return response()->json(['message' => 'قائمة إيصالات القبض', 'data' => $payments]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'store_id' => 'required|exists:stores,id',
+            'keeper_id' => 'required|exists:users,id',
+            'amount' => 'required|numeric|min:0.01',
+            'payment_method' => 'required|in:cash,transfer,certified_check',
+            'notes' => 'nullable|string'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $currentDebt = DB::table('store_debt_ledger')
+                ->where('store_id', $request->store_id)
+                ->sum('amount');
+
+            if ($request->amount > $currentDebt) {
+                return response()->json(['message' => 'المبلغ المسدد أكبر من الدين الحالي'], 400);
+            }
+
+            $paymentNumber = 'PAY-' . date('Ymd') . '-' . str_pad(DB::table('store_payments')->count() + 1, 4, '0', STR_PAD_LEFT);
+
+            $paymentId = DB::table('store_payments')->insertGetId([
+                'payment_number' => $paymentNumber,
+                'store_id' => $request->store_id,
+                'marketer_id' => $request->user()->id,
+                'keeper_id' => $request->keeper_id,
+                'amount' => $request->amount,
+                'payment_method' => $request->payment_method,
+                'status' => 'pending',
+                'notes' => $request->notes,
+                'created_at' => now()
+            ]);
+
+            DB::commit();
+            return response()->json(['message' => 'تم إنشاء إيصال القبض بنجاح', 'data' => ['id' => $paymentId, 'payment_number' => $paymentNumber]], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'فشل إنشاء إيصال القبض', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function show(Request $request, $id)
+    {
+        $payment = DB::table('store_payments')
+            ->join('stores', 'store_payments.store_id', '=', 'stores.id')
+            ->join('users as keeper', 'store_payments.keeper_id', '=', 'keeper.id')
+            ->where('store_payments.id', $id)
+            ->where('store_payments.marketer_id', $request->user()->id)
+            ->select('store_payments.*', 'stores.name as store_name', 'keeper.full_name as keeper_name')
+            ->first();
+
+        if (!$payment) {
+            return response()->json(['message' => 'إيصال القبض غير موجود'], 404);
+        }
+
+        if ($payment->receipt_image) {
+            $payment->receipt_image = asset('storage/' . $payment->receipt_image);
+        }
+
+        $commission = DB::table('marketer_commissions')
+            ->where('payment_id', $id)
+            ->first();
+
+        return response()->json(['message' => 'تفاصيل إيصال القبض', 'data' => ['payment' => $payment, 'commission' => $commission]]);
+    }
+
+    public function cancel(Request $request, $id)
+    {
+        $request->validate(['notes' => 'nullable|string']);
+
+        DB::beginTransaction();
+        try {
+            $payment = DB::table('store_payments')
+                ->where('id', $id)
+                ->where('marketer_id', $request->user()->id)
+                ->where('status', 'pending')
+                ->first();
+
+            if (!$payment) {
+                return response()->json(['message' => 'إيصال القبض غير موجود أو لا يمكن إلغاؤه'], 404);
+            }
+
+            DB::table('store_payments')->where('id', $id)->update([
+                'status' => 'cancelled',
+                'notes' => $request->notes
+            ]);
+
+            DB::commit();
+            return response()->json(['message' => 'تم إلغاء إيصال القبض بنجاح']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'حدث خطأ أثناء إلغاء إيصال القبض'], 500);
+        }
+    }
+}

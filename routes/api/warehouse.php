@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Warehouse\WarehouseRequestController;
 use App\Http\Controllers\Api\Warehouse\WarehouseReturnController;
 use App\Http\Controllers\Api\Warehouse\WarehouseSalesController;
+use App\Http\Controllers\Api\Warehouse\WarehousePaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,5 +40,13 @@ Route::middleware(['auth:sanctum', 'role:warehouse_keeper'])->group(function () 
     Route::get('sales/{id}/rejection', [WarehouseSalesController::class, 'getRejection']);
     Route::post('sales/{id}/approve', [WarehouseSalesController::class, 'approve']);
     Route::put('sales/{id}/reject', [WarehouseSalesController::class, 'reject']);
+    
+    // ┌─────────────────────────────────────────────────────────────────┐
+    // │ Warehouse Payments API - إدارة إيصالات القبض              │
+    // └─────────────────────────────────────────────────────────────────┘
+    Route::get('payments', [WarehousePaymentController::class, 'index']);
+    Route::get('payments/{id}', [WarehousePaymentController::class, 'show']);
+    Route::post('payments/{id}/approve', [WarehousePaymentController::class, 'approve']);
+    Route::put('payments/{id}/reject', [WarehousePaymentController::class, 'reject']);
     
 });
