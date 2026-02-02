@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Store;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StoreController extends Controller
 {
@@ -26,5 +27,14 @@ class StoreController extends Controller
 
         $store = Store::create($validated);
         return response()->json($store, 201);
+    }
+
+    public function getDebt($id)
+    {
+        $debt = DB::table('store_debt_ledger')
+            ->where('store_id', $id)
+            ->sum('amount');
+
+        return response()->json(['debt' => $debt]);
     }
 }

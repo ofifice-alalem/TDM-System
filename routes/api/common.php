@@ -10,6 +10,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     Route::get('/stores', [StoreController::class, 'index']);
     Route::post('/stores', [StoreController::class, 'store']);
+    Route::get('/stores/{id}/debt', [StoreController::class, 'getDebt']);
     
     Route::get('/warehouse/main-stock', function() {
         $stock = \DB::table('main_stock')

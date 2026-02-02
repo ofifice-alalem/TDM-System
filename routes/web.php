@@ -46,6 +46,10 @@ Route::middleware(['auth'])->prefix('marketer')->group(function () {
     Route::get('/sales', [App\Http\Controllers\Web\Marketer\SalesController::class, 'index']);
     Route::get('/sales/create', [App\Http\Controllers\Web\Marketer\SalesController::class, 'create']);
     Route::get('/sales/{id}', [App\Http\Controllers\Web\Marketer\SalesController::class, 'show']);
+    
+    Route::get('/payments', [App\Http\Controllers\Web\Marketer\PaymentController::class, 'index']);
+    Route::get('/payments/create', [App\Http\Controllers\Web\Marketer\PaymentController::class, 'create']);
+    Route::get('/payments/{id}', [App\Http\Controllers\Web\Marketer\PaymentController::class, 'show']);
 });
 
 // Warehouse Routes
@@ -58,4 +62,7 @@ Route::middleware(['auth'])->prefix('warehouse')->group(function () {
     
     Route::get('/sales', [App\Http\Controllers\Web\Warehouse\SalesController::class, 'index']);
     Route::get('/sales/{id}', [App\Http\Controllers\Web\Warehouse\SalesController::class, 'show']);
+    
+    Route::get('/payments', [App\Http\Controllers\Web\Warehouse\PaymentController::class, 'index']);
+    Route::get('/payments/{id}', [App\Http\Controllers\Web\Warehouse\PaymentController::class, 'show']);
 });

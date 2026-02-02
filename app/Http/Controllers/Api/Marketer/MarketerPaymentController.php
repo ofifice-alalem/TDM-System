@@ -24,7 +24,6 @@ class MarketerPaymentController extends Controller
     {
         $request->validate([
             'store_id' => 'required|exists:stores,id',
-            'keeper_id' => 'required|exists:users,id',
             'amount' => 'required|numeric|min:0.01',
             'payment_method' => 'required|in:cash,transfer,certified_check',
             'notes' => 'nullable|string'
@@ -46,7 +45,7 @@ class MarketerPaymentController extends Controller
                 'payment_number' => $paymentNumber,
                 'store_id' => $request->store_id,
                 'marketer_id' => $request->user()->id,
-                'keeper_id' => $request->keeper_id,
+                'keeper_id' => 1,
                 'amount' => $request->amount,
                 'payment_method' => $request->payment_method,
                 'status' => 'pending',
