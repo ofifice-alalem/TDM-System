@@ -29,7 +29,6 @@ class RequestController extends Controller
     public function print($id)
     {
         $marketerRequest = MarketerRequest::with(['user', 'approver', 'items.product'])
-            ->where('marketer_id', auth()->id())
             ->where('status', 'approved')
             ->findOrFail($id);
 

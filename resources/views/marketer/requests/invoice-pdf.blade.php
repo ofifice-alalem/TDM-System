@@ -12,8 +12,8 @@
         }
         @font-face {
             font-family: 'Cairo';
-            src: url('{{ public_path("fonts/Cairo-Bold.ttf") }}') format('truetype');
-            font-weight: bold;
+            src: url('{{ public_path("fonts/Cairo-ExtraBold.ttf") }}') format('truetype');
+            font-weight: 900;
             font-style: normal;
         }
         @page { margin: 15px; }
@@ -23,7 +23,7 @@
         .header-right { display: table-cell; text-align: right; width: 50%; vertical-align: middle; }
         .header-left { display: table-cell; text-align: left; width: 50%; vertical-align: middle; }
         .header h1 { margin: 0; font-size: 20px; font-weight: bold; }
-        .header h2 { margin: 0; font-size: 20px; font-weight: bold; color: white; }
+        .header h2 { margin: 0; font-size: 22px; font-weight: 900; color: white; letter-spacing: 0.5px; }
         .info-box { background-color: #f8f9fa; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #333; text-align: right; }
         .info-row { display: inline-block; width: 48%; margin-bottom: 4px; font-size: 11px; text-align: right; font-weight: bold; }
         .label { font-weight: bold; color: #333; font-size: 11px; }

@@ -18,6 +18,7 @@ Route::middleware(['auth:sanctum', 'role:warehouse_keeper'])->group(function () 
     Route::get('requests/{id}', [WarehouseRequestController::class, 'show']);
     Route::put('requests/{id}/approve', [WarehouseRequestController::class, 'approve']);
     Route::put('requests/{id}/reject', [WarehouseRequestController::class, 'reject']);
+    Route::put('requests/{id}/cancel', [WarehouseRequestController::class, 'cancel']);
     Route::post('requests/{id}/document', [WarehouseRequestController::class, 'document']);
     
 });

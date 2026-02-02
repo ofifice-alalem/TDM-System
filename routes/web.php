@@ -38,3 +38,9 @@ Route::middleware(['auth'])->prefix('marketer')->group(function () {
     Route::get('/requests/{id}', [App\Http\Controllers\Web\Marketer\RequestController::class, 'show']);
     Route::get('/requests/{id}/print', [App\Http\Controllers\Web\Marketer\RequestController::class, 'print'])->name('marketer.requests.print');
 });
+
+// Warehouse Routes
+Route::middleware(['auth'])->prefix('warehouse')->group(function () {
+    Route::get('/requests', [App\Http\Controllers\Web\Warehouse\RequestController::class, 'index']);
+    Route::get('/requests/{id}', [App\Http\Controllers\Web\Warehouse\RequestController::class, 'show']);
+});
