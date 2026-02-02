@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Warehouse\WarehouseRequestController;
+use App\Http\Controllers\Api\Warehouse\WarehouseReturnController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,5 +21,14 @@ Route::middleware(['auth:sanctum', 'role:warehouse_keeper'])->group(function () 
     Route::put('requests/{id}/reject', [WarehouseRequestController::class, 'reject']);
     Route::put('requests/{id}/cancel', [WarehouseRequestController::class, 'cancel']);
     Route::post('requests/{id}/document', [WarehouseRequestController::class, 'document']);
+    
+    // ┌─────────────────────────────────────────────────────────────────┐
+    // │ Warehouse Returns API - إدارة إرجاع البضاعة              │
+    // └─────────────────────────────────────────────────────────────────┘
+    Route::get('returns', [WarehouseReturnController::class, 'index']);
+    Route::get('returns/{id}', [WarehouseReturnController::class, 'show']);
+    Route::put('returns/{id}/approve', [WarehouseReturnController::class, 'approve']);
+    Route::put('returns/{id}/reject', [WarehouseReturnController::class, 'reject']);
+    Route::post('returns/{id}/document', [WarehouseReturnController::class, 'document']);
     
 });
