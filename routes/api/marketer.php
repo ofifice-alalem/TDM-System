@@ -36,6 +36,7 @@ Route::middleware(['auth:sanctum', 'role:salesman'])->group(function () {
     Route::get('sales', [MarketerSalesController::class, 'index']);
     Route::post('sales', [MarketerSalesController::class, 'store']);
     Route::get('sales/{id}', [MarketerSalesController::class, 'show']);
+    Route::get('sales/{id}/rejection', [MarketerSalesController::class, 'getRejection']);
     Route::put('sales/{id}/cancel', [MarketerSalesController::class, 'cancel']);
     
     // ┌─────────────────────────────────────────────────────────────────┐

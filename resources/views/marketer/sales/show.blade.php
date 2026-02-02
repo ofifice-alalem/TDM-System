@@ -25,6 +25,7 @@
     .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
     .status-approved { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
     .status-cancelled { background: rgba(100, 116, 139, 0.1); color: #64748b; }
+    .status-rejected { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
     
     .products-table { width: 100%; border-collapse: collapse; }
     .products-table thead th { background: #f8fafc; padding: 16px 24px; text-align: right; font-size: 14px; font-weight: 600; color: #64748b; }
@@ -86,6 +87,25 @@
             <div style="display: flex; flex-direction: column; gap: 4px; padding: 8px 0;">
                 <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">بتاريخ</div>
                 <div style="font-size: 14px; font-weight: 700; color: var(--text-light);" id="confirmedAt">-</div>
+            </div>
+        </div>
+        
+        <div id="rejectionSection" style="display: none; background: rgba(239, 68, 68, 0.05); padding: 16px; border-radius: 16px; border: 1px solid rgba(239, 68, 68, 0.1); margin-top: 20px;">
+            <div style="font-size: 14px; font-weight: 700; color: #ef4444; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                تم الرفض
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
+                <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">بواسطة</div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-light);" id="rejectedBy">-</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
+                <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">بتاريخ</div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-light);" id="rejectedAt">-</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 8px 0;">
+                <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">السبب</div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--text-light); line-height: 1.6;" id="rejectionReason">-</div>
             </div>
         </div>
     </div>
@@ -190,7 +210,8 @@
         const statusMap = {
             'pending': { label: 'قيد الانتظار', class: 'status-pending' },
             'approved': { label: 'موثقة', class: 'status-approved' },
-            'cancelled': { label: 'ملغية', class: 'status-cancelled' }
+            'cancelled': { label: 'ملغية', class: 'status-cancelled' },
+            'rejected': { label: 'مرفوضة', class: 'status-rejected' }
         };
         const status = statusMap[invoice.status] || { label: invoice.status, class: '' };
         
@@ -205,6 +226,10 @@
             document.getElementById('approvalSection').style.display = 'block';
             document.getElementById('keeperName').textContent = invoice.keeper_name;
             document.getElementById('confirmedAt').textContent = invoice.confirmed_at ? new Date(invoice.confirmed_at).toLocaleDateString('en-US').replace(/\//g, '-') : '-';
+        }
+        
+        if (invoice.status === 'rejected') {
+            fetchRejectionDetails();
         }
 
         const tbody = document.getElementById('productsBody');
@@ -278,6 +303,23 @@
 
     function closeImageModal() {
         document.getElementById('imageModal').classList.remove('active');
+    }
+    
+    async function fetchRejectionDetails() {
+        try {
+            const response = await fetch(`/api/marketer/sales/${invoiceId}/rejection`, {
+                headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+            });
+            const result = await response.json();
+            if (result.data) {
+                document.getElementById('rejectionSection').style.display = 'block';
+                document.getElementById('rejectedBy').textContent = result.data.rejected_by_name || '---';
+                document.getElementById('rejectedAt').textContent = result.data.rejected_at ? new Date(result.data.rejected_at).toLocaleDateString('en-US').replace(/\//g, '-') : '-';
+                document.getElementById('rejectionReason').textContent = result.data.rejection_reason || '---';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
 
     fetchDetails();

@@ -42,6 +42,7 @@
     .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
     .status-approved { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
     .status-cancelled { background: rgba(100, 116, 139, 0.1); color: #64748b; }
+    .status-rejected { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
     
     .btn-action { padding: 10px 20px; background: var(--primary); color: white; border-radius: 10px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 8px; }
     .btn-action:hover { background: #7c3aed; transform: translateY(-2px); }
@@ -67,6 +68,7 @@
     <button class="tab-btn" onclick="switchTab('pending', this)">قيد الانتظار</button>
     <button class="tab-btn" onclick="switchTab('approved', this)">موثقة</button>
     <button class="tab-btn" onclick="switchTab('cancelled', this)">ملغية</button>
+    <button class="tab-btn" onclick="switchTab('rejected', this)">مرفوضة</button>
 </div>
 
 <div class="filters-bar">
@@ -136,7 +138,8 @@
             const statusMap = {
                 'pending': { label: 'قيد الانتظار', class: 'status-pending', bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>' },
                 'approved': { label: 'موثقة', class: 'status-approved', bg: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' },
-                'cancelled': { label: 'ملغية', class: 'status-cancelled', bg: 'rgba(100, 116, 139, 0.1)', color: '#64748b', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line></svg>' }
+                'cancelled': { label: 'ملغية', class: 'status-cancelled', bg: 'rgba(100, 116, 139, 0.1)', color: '#64748b', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line></svg>' },
+                'rejected': { label: 'مرفوضة', class: 'status-rejected', bg: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' }
             };
             const status = statusMap[inv.status] || { label: inv.status, class: '', icon: '', bg: 'rgba(139, 92, 246, 0.1)', color: 'var(--primary)' };
 

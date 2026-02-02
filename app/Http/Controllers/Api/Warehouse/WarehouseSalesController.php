@@ -171,4 +171,19 @@ class WarehouseSalesController extends Controller
             return response()->json(['message' => 'حدث خطأ أثناء الرفض', 'error' => $e->getMessage()], 500);
         }
     }
+    
+    public function getRejection($id)
+    {
+        $rejection = DB::table('sales_invoice_rejections')
+            ->join('users', 'sales_invoice_rejections.rejected_by', '=', 'users.id')
+            ->where('sales_invoice_rejections.sales_invoice_id', $id)
+            ->select('sales_invoice_rejections.*', 'users.full_name as rejected_by_name')
+            ->first();
+
+        if (!$rejection) {
+            return response()->json(['message' => 'لا توجد معلومات رفض'], 404);
+        }
+
+        return response()->json(['message' => 'معلومات الرفض', 'data' => $rejection]);
+    }
 }

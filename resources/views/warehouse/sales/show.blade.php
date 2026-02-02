@@ -94,6 +94,25 @@
                 <div style="font-size: 14px; font-weight: 700; color: var(--text-light);" id="confirmedAt">-</div>
             </div>
         </div>
+        
+        <div id="rejectionSection" style="display: none; background: rgba(239, 68, 68, 0.05); padding: 16px; border-radius: 16px; border: 1px solid rgba(239, 68, 68, 0.1); margin-top: 20px;">
+            <div style="font-size: 14px; font-weight: 700; color: #ef4444; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                تم الرفض
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
+                <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">بواسطة</div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-light);" id="rejectedBy">-</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
+                <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">بتاريخ</div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-light);" id="rejectedAt">-</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 8px 0;">
+                <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">السبب</div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--text-light); line-height: 1.6;" id="rejectionReason">-</div>
+            </div>
+        </div>
     </div>
 
     <div class="invoice-content">
@@ -250,6 +269,10 @@
             document.getElementById('keeperName').textContent = invoice.keeper_name;
             document.getElementById('confirmedAt').textContent = invoice.confirmed_at ? new Date(invoice.confirmed_at).toLocaleDateString('en-US').replace(/\//g, '-') : '-';
         }
+        
+        if (invoice.status === 'rejected') {
+            fetchRejectionDetails();
+        }
 
         const tbody = document.getElementById('productsBody');
         if (items && items.length > 0) {
@@ -360,6 +383,23 @@
 
     function closeImageModal() {
         document.getElementById('imageModal').classList.remove('active');
+    }
+    
+    async function fetchRejectionDetails() {
+        try {
+            const response = await fetch(`/api/warehouse/sales/${invoiceId}/rejection`, {
+                headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+            });
+            const result = await response.json();
+            if (result.data) {
+                document.getElementById('rejectionSection').style.display = 'block';
+                document.getElementById('rejectedBy').textContent = result.data.rejected_by_name || '---';
+                document.getElementById('rejectedAt').textContent = result.data.rejected_at ? new Date(result.data.rejected_at).toLocaleDateString('en-US').replace(/\//g, '-') : '-';
+                document.getElementById('rejectionReason').textContent = result.data.rejection_reason || '---';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
 
     fetchDetails();
