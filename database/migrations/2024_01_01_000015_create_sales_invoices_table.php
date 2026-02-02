@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('invoice_discount_type', ['percentage', 'fixed'])->nullable();
             $table->decimal('invoice_discount_value', 10, 2)->nullable();
             $table->decimal('invoice_discount_amount', 12, 2)->default(0.00);
-            $table->enum('status', ['pending', 'approved', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'cancelled', 'rejected'])->default('pending');
             $table->foreignId('keeper_id')->nullable()->constrained('users');
             $table->string('stamped_invoice_image')->nullable();
             $table->timestamp('confirmed_at')->nullable();

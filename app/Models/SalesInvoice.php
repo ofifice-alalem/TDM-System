@@ -51,4 +51,9 @@ class SalesInvoice extends Model
     {
         return $this->hasMany(SalesInvoiceItem::class, 'invoice_id');
     }
+
+    public function rejection()
+    {
+        return $this->hasOne(SalesInvoiceRejection::class, 'sales_invoice_id');
+    }
 }

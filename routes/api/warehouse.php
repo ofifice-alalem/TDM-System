@@ -37,5 +37,6 @@ Route::middleware(['auth:sanctum', 'role:warehouse_keeper'])->group(function () 
     Route::get('sales', [WarehouseSalesController::class, 'index']);
     Route::get('sales/{id}', [WarehouseSalesController::class, 'show']);
     Route::post('sales/{id}/approve', [WarehouseSalesController::class, 'approve']);
+    Route::put('sales/{id}/reject', [WarehouseSalesController::class, 'reject']);
     
 });

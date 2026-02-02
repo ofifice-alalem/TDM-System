@@ -403,6 +403,7 @@
 <div class="tabs-container">
     <button class="tab-btn active" onclick="switchTab('actual', this)">المخزون الفعلي</button>
     <button class="tab-btn" onclick="switchTab('reserved', this)">المحجوز</button>
+    <button class="tab-btn" onclick="switchTab('invoices', this)">فواتير محلات</button>
 </div>
 
 <div class="content-header-premium">
@@ -434,25 +435,28 @@
 <script>
     const token = '{{ $token }}';
     let currentTab = 'actual';
-    let allData = { actual: [], reserved: [], products: [] };
+    let allData = { actual: [], reserved: [], products: [], invoices: [] };
 
     async function fetchData() {
         try {
             const headers = { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' };
-            const [resActual, resReserved, resProducts] = await Promise.all([
+            const [resActual, resReserved, resProducts, resInvoices] = await Promise.all([
                 fetch('/api/marketer/stock/actual', { headers }),
                 fetch('/api/marketer/stock/reserved', { headers }),
-                fetch('/api/products', { headers })
+                fetch('/api/products', { headers }),
+                fetch('/api/marketer/sales', { headers })
             ]);
 
             const actual = await resActual.json();
             const reserved = await resReserved.json();
             const products = await resProducts.json();
+            const invoices = await resInvoices.json();
 
             allData = {
                 actual: actual.data || [],
                 reserved: reserved.data || [],
-                products: products.data || products || []
+                products: products.data || products || [],
+                invoices: (invoices.data || []).filter(inv => inv.status === 'pending')
             };
 
             updateStats();
@@ -478,6 +482,12 @@
 
     function renderProducts(filter = '') {
         const grid = document.getElementById('productsGrid');
+        
+        if (currentTab === 'invoices') {
+            renderInvoices(filter);
+            return;
+        }
+        
         const activeData = currentTab === 'actual' ? allData.actual : allData.reserved;
         
         // Group by product_id and sum quantities
@@ -566,6 +576,63 @@
             obj.innerHTML = current;
             if (current == end) clearInterval(timer);
         }, stepTime || 1);
+    }
+
+    function renderInvoices(filter = '') {
+        const grid = document.getElementById('productsGrid');
+        const filtered = allData.invoices.filter(inv => {
+            const searchStr = `${inv.invoice_number} ${inv.store_name}`.toLowerCase();
+            return searchStr.includes(filter.toLowerCase());
+        });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-art">📄</div>
+                    <h3>لا توجد فواتير</h3>
+                    <p>لا توجد فواتير محلات في حالة قيد الانتظار أو موثقة</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = filtered.map(inv => {
+            const statusMap = {
+                'pending': { label: 'قيد الانتظار', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
+                'approved': { label: 'موثقة', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)' }
+            };
+            const status = statusMap[inv.status] || { label: inv.status, color: '#64748b', bg: 'rgba(100, 116, 139, 0.1)' };
+
+            return `
+                <div class="product-card">
+                    <div class="product-top">
+                        <div class="product-icon-box">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        </div>
+                        <span class="badge-status" style="background: ${status.bg}; color: ${status.color};">${status.label}</span>
+                    </div>
+                    <div class="product-main">
+                        <h3 class="product-name" style="font-size: 18px;">#${inv.invoice_number}</h3>
+                        <p class="product-barcode">${inv.store_name}</p>
+                    </div>
+                    <div class="product-divider" style="margin-bottom: 20px;"></div>
+                    <div class="product-details">
+                        <div class="detail-item">
+                            <span class="detail-label" style="font-weight: 500;">التاريخ</span>
+                            <span class="detail-value stock-val" style="font-size: 14px;">${new Date(inv.created_at).toLocaleDateString('en-US').replace(/\//g, '-')}</span>
+                        </div>
+                        <div class="detail-item" style="align-items: flex-end; text-align: left;">
+                            <span class="detail-label" style="font-weight: 500;">المبلغ</span>
+                            <span class="detail-value price-val" style="font-size: 18px; color: #10b981;">${parseFloat(inv.total_amount).toFixed(2)} د</span>
+                        </div>
+                    </div>
+                    <button onclick="window.location.href='/marketer/sales/${inv.id}'" style="width: 100%; margin-top: 16px; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-family: 'Tajawal', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        تفاصيل الفاتورة
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            `;
+        }).join('');
     }
 
     function showError() {

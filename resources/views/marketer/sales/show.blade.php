@@ -51,8 +51,13 @@
     .modal-btn-secondary { background: var(--bg-light); color: #64748b; border: 1px solid var(--border-light); }
     
     .image-modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.95); z-index: 10000; }
-    .image-modal-overlay.active { display: flex; align-items: center; justify-content: center; }
-    .image-modal-content img { max-width: 85%; max-height: 80vh; border-radius: 16px; }
+    .image-modal-overlay.active { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    .image-modal-header { position: absolute; top: 20px; right: 20px; left: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10001; }
+    .image-modal-title { color: white; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .image-modal-close { padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; font-family: 'Tajawal', sans-serif; }
+    .image-modal-close:hover { background: rgba(255, 255, 255, 0.2); }
+    .image-modal-content { max-width: 85%; max-height: 80vh; }
+    .image-modal-content img { max-width: 100%; max-height: 80vh; border-radius: 16px; box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6); object-fit: contain; }
 </style>
 @endpush
 
@@ -68,6 +73,21 @@
     <div class="actions-sidebar">
         <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 24px;">الإجراءات</h3>
         <div id="actionsContainer" style="display: flex; flex-direction: column; gap: 16px;"></div>
+        
+        <div id="approvalSection" style="display: none; background: rgba(59, 130, 246, 0.05); padding: 16px; border-radius: 16px; border: 1px solid rgba(59, 130, 246, 0.1); margin-top: 20px;">
+            <div style="font-size: 14px; font-weight: 700; color: #3b82f6; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                تم التوثيق
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
+                <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">بواسطة</div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-light);" id="keeperName">-</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 8px 0;">
+                <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">بتاريخ</div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-light);" id="confirmedAt">-</div>
+            </div>
+        </div>
     </div>
 
     <div class="invoice-content">
@@ -79,6 +99,7 @@
                 <div><div class="info-label">الإجمالي</div><div class="info-value" id="totalAmount">-</div></div>
             </div>
         </div>
+
 
         <div class="info-card">
             <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 28px;">المنتجات</h2>
@@ -101,7 +122,19 @@
 </div>
 
 <div class="image-modal-overlay" id="imageModal" onclick="if(event.target === this) closeImageModal()">
-    <div class="image-modal-content"><img id="documentImage" src="" alt="صورة التوثيق"></div>
+    <div class="image-modal-header">
+        <div class="image-modal-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            صورة التوثيق
+        </div>
+        <button class="image-modal-close" onclick="closeImageModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            إغلاق
+        </button>
+    </div>
+    <div class="image-modal-content">
+        <img id="documentImage" src="" alt="صورة التوثيق">
+    </div>
 </div>
 
 <div class="modal-overlay" id="confirmModal">
@@ -168,6 +201,12 @@
         document.getElementById('createdAt').textContent = new Date(invoice.created_at).toLocaleDateString('en-US').replace(/\//g, '-');
         document.getElementById('totalAmount').textContent = parseFloat(invoice.total_amount).toFixed(2) + ' د';
 
+        if (invoice.status === 'approved' && invoice.keeper_name) {
+            document.getElementById('approvalSection').style.display = 'block';
+            document.getElementById('keeperName').textContent = invoice.keeper_name;
+            document.getElementById('confirmedAt').textContent = invoice.confirmed_at ? new Date(invoice.confirmed_at).toLocaleDateString('en-US').replace(/\//g, '-') : '-';
+        }
+
         const tbody = document.getElementById('productsBody');
         if (items && items.length > 0) {
             tbody.innerHTML = items.map(item => `
@@ -193,7 +232,7 @@
         }
 
         if (status === 'approved' && stampedImage) {
-            html += `<button class="btn" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;" onclick="viewDocument()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>عرض التوثيق</button>`;
+            html += `<button class="btn" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;" onclick="viewDocument(event)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>عرض التوثيق</button>`;
         }
 
         html += `<button class="btn btn-secondary" onclick="window.history.back()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"></path><polyline points="12 19 5 12 12 5"></polyline></svg>رجوع</button>`;
@@ -221,7 +260,8 @@
         }
     }
 
-    async function viewDocument() {
+    async function viewDocument(event) {
+        if (event) event.preventDefault();
         try {
             const response = await fetch(`/api/marketer/sales/${invoiceId}`, {
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
