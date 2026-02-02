@@ -75,4 +75,5 @@ Route::middleware(['auth'])->prefix('warehouse')->group(function () {
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/withdrawals', [App\Http\Controllers\Web\Admin\WithdrawalController::class, 'index'])->name('admin.withdrawals.index');
     Route::get('/withdrawals/{id}', [App\Http\Controllers\Web\Admin\WithdrawalController::class, 'show'])->name('admin.withdrawals.show');
+    Route::get('/marketers', [App\Http\Controllers\Web\Admin\MarketerController::class, 'index'])->name('admin.marketers.index');
 });

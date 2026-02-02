@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\Admin\AdminWithdrawalController;
+use App\Http\Controllers\Api\Admin\AdminMarketerController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,6 +25,10 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::get('withdrawals/{id}', [AdminWithdrawalController::class, 'show']);
     Route::post('withdrawals/{id}/approve', [AdminWithdrawalController::class, 'approve']);
     Route::post('withdrawals/{id}/reject', [AdminWithdrawalController::class, 'reject']);
+    
+    // Marketers Management
+    Route::get('marketers', [AdminMarketerController::class, 'index']);
+    Route::put('marketers/{id}/commission-rate', [AdminMarketerController::class, 'updateCommissionRate']);
     
     // Future: Reports, Users Management, etc.
     
