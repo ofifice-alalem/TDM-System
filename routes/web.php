@@ -38,10 +38,17 @@ Route::middleware(['auth'])->prefix('marketer')->group(function () {
     Route::get('/requests/{id}', [App\Http\Controllers\Web\Marketer\RequestController::class, 'show']);
     Route::get('/requests/{id}/print', [App\Http\Controllers\Web\Marketer\RequestController::class, 'print'])->name('marketer.requests.print');
     Route::get('/requests/{id}/documentation', [App\Http\Controllers\Web\Marketer\RequestController::class, 'documentation'])->name('marketer.requests.documentation');
+    
+    Route::get('/returns', [App\Http\Controllers\Web\Marketer\ReturnController::class, 'index']);
+    Route::get('/returns/create', [App\Http\Controllers\Web\Marketer\ReturnController::class, 'create']);
+    Route::get('/returns/{id}', [App\Http\Controllers\Web\Marketer\ReturnController::class, 'show']);
 });
 
 // Warehouse Routes
 Route::middleware(['auth'])->prefix('warehouse')->group(function () {
     Route::get('/requests', [App\Http\Controllers\Web\Warehouse\RequestController::class, 'index']);
     Route::get('/requests/{id}', [App\Http\Controllers\Web\Warehouse\RequestController::class, 'show']);
+    
+    Route::get('/returns', [App\Http\Controllers\Web\Warehouse\ReturnController::class, 'index']);
+    Route::get('/returns/{id}', [App\Http\Controllers\Web\Warehouse\ReturnController::class, 'show']);
 });
