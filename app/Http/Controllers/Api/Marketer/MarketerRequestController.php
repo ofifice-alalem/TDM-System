@@ -85,14 +85,25 @@ class MarketerRequestController extends Controller
     public function show(Request $request, $id)
     {
         $requestData = DB::table('marketer_requests')
-            ->where('id', $id)
-            ->where('marketer_id', $request->user()->id)
+            ->leftJoin('users as approver', 'marketer_requests.approved_by', '=', 'approver.id')
+            ->leftJoin('users as documenter', 'marketer_requests.documented_by', '=', 'documenter.id')
+            ->where('marketer_requests.id', $id)
+            ->where('marketer_requests.marketer_id', $request->user()->id)
+            ->select(
+                'marketer_requests.*',
+                'approver.full_name as approver_name',
+                'documenter.full_name as documenter_name'
+            )
             ->first();
 
         if (!$requestData) {
             return response()->json([
                 'message' => 'الطلب غير موجود'
             ], 404);
+        }
+
+        if ($requestData->stamped_image) {
+            $requestData->stamped_image = asset('storage/' . $requestData->stamped_image);
         }
 
         $items = DB::table('marketer_request_items')

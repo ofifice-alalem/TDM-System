@@ -532,7 +532,7 @@
         document.getElementById('statusBadge').textContent = status.label;
         document.getElementById('statusBadge').className = `status-badge ${status.class}`;
         document.getElementById('invoiceNumber').textContent = `#${request.invoice_number}`;
-        document.getElementById('marketerName').textContent = request.user?.name || '---';
+        document.getElementById('marketerName').textContent = request.marketer_name || request.user?.full_name || '---';
         document.getElementById('createdAt').textContent = `${formattedDate} | ${formattedTime}`;
         document.getElementById('itemsCountBadge').textContent = `${items.length} أصناف`;
 
@@ -540,7 +540,7 @@
         if (request.status === 'approved' || request.status === 'documented') {
             if (request.approved_by && request.approved_at) {
                 document.getElementById('approvalSidebarSection').style.display = 'block';
-                document.getElementById('sidebarApprovedBy').textContent = request.approver?.name || 'المسؤول';
+                document.getElementById('sidebarApprovedBy').textContent = request.approver_name || 'المسؤول';
                 const appDate = new Date(request.approved_at);
                 document.getElementById('sidebarApprovedAt').textContent = appDate.toLocaleDateString('en-US').replace(/\//g, '-');
             }
@@ -550,7 +550,7 @@
         if (request.status === 'documented') {
             if (request.documented_by && request.documented_at) {
                 document.getElementById('documentationSidebarSection').style.display = 'block';
-                document.getElementById('sidebarDocumentedBy').textContent = request.documenter?.name || 'أمين المخزن';
+                document.getElementById('sidebarDocumentedBy').textContent = request.documenter_name || 'أمين المخزن';
                 const docDate = new Date(request.documented_at);
                 document.getElementById('sidebarDocumentedAt').textContent = docDate.toLocaleDateString('en-US').replace(/\//g, '-');
             }
@@ -607,8 +607,8 @@
 
         if (status === 'documented') {
             html += `
-                <button class="btn" style="background: rgba(59, 130, 246, 0.1); color: var(--info); border: 1px solid rgba(59, 130, 246, 0.2); margin-top: 8px;" onclick="window.open('/marketer/requests/${requestId}/documentation', '_blank')">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <button class="btn btn-success" onclick="viewDocumentation()" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     عرض التوثيق
                 </button>
             `;
@@ -645,3 +645,145 @@
     fetchRequestDetails();
 </script>
 @endpush
+
+<div class="image-modal-overlay" id="imageModal">
+    <div class="image-modal-header">
+        <div class="image-modal-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            صورة التوثيق
+        </div>
+        <div class="image-modal-actions">
+            <button class="image-modal-btn image-modal-btn-download" id="downloadImageBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                تنزيل
+            </button>
+            <button class="image-modal-btn image-modal-btn-close" onclick="closeImageModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                إغلاق
+            </button>
+        </div>
+    </div>
+    <div class="image-modal-content">
+        <img id="documentImage" src="" alt="صورة التوثيق">
+    </div>
+</div>
+
+<style>
+    .image-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 10000;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .image-modal-overlay.active { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+
+    .image-modal-header {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        left: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 10001;
+    }
+
+    .image-modal-title {
+        color: white;
+        font-size: 18px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .image-modal-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .image-modal-btn {
+        padding: 10px 20px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .image-modal-btn-download {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .image-modal-btn-download:hover { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+
+    .image-modal-btn-close {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .image-modal-btn-close:hover { background: rgba(255, 255, 255, 0.2); }
+
+    .image-modal-content {
+        max-width: 90%;
+        max-height: 85vh;
+        animation: slideUp 0.3s ease;
+    }
+
+    .image-modal-content img {
+        max-width: 100%;
+        max-height: 85vh;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<script>
+    async function viewDocumentation() {
+        try {
+            const response = await fetch(`/api/marketer/requests/${requestId}`, {
+                headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+            });
+            const result = await response.json();
+            
+            if (result.data && result.data.request.stamped_image) {
+                const imageUrl = result.data.request.stamped_image;
+                document.getElementById('documentImage').src = imageUrl;
+                document.getElementById('imageModal').classList.add('active');
+                
+                document.getElementById('downloadImageBtn').onclick = function() {
+                    const link = document.createElement('a');
+                    link.href = imageUrl;
+                    link.download = `توثيق-${result.data.request.invoice_number}.png`;
+                    link.click();
+                };
+            } else {
+                alert('لا توجد صورة توثيق متاحة');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('حدث خطأ أثناء عرض التوثيق');
+        }
+    }
+
+    function closeImageModal() {
+        document.getElementById('imageModal').classList.remove('active');
+    }
+</script>

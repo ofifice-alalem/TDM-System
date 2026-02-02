@@ -33,15 +33,21 @@ class RequestController extends Controller
             ->findOrFail($id);
 
         $arabic = new \ArPHP\I18N\Arabic();
+        
+        $toEnglishNumbers = function($str) {
+            $western = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            $eastern = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            return str_replace($eastern, $western, $str);
+        };
 
         $data = [
             'invoiceNumber' => $marketerRequest->invoice_number,
             'date' => $marketerRequest->created_at->format('Y-m-d H:i'),
             'marketerName' => $arabic->utf8Glyphs($marketerRequest->user->full_name),
             'approvedBy' => $marketerRequest->approver ? $arabic->utf8Glyphs($marketerRequest->approver->full_name) : null,
-            'items' => $marketerRequest->items->map(function($item) use ($arabic) {
+            'items' => $marketerRequest->items->map(function($item) use ($arabic, $toEnglishNumbers) {
                 return (object)[
-                    'name' => $arabic->utf8Glyphs($item->product->name),
+                    'name' => $toEnglishNumbers($arabic->utf8Glyphs($item->product->name)),
                     'quantity' => $item->quantity
                 ];
             }),
@@ -55,10 +61,28 @@ class RequestController extends Controller
                 'keeper' => $arabic->utf8Glyphs('أمين المخزن'),
                 'product' => $arabic->utf8Glyphs('المنتج'),
                 'quantity' => $arabic->utf8Glyphs('الكمية'),
+                'total' => $arabic->utf8Glyphs('الإجمالي'),
             ]
         ];
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('marketer.requests.invoice-pdf', $data)->setPaper('a4');
         return $pdf->download('request-' . $marketerRequest->invoice_number . '.pdf');
+    }
+
+    public function documentation($id)
+    {
+        $marketerRequest = MarketerRequest::where('status', 'documented')->findOrFail($id);
+        
+        if (!$marketerRequest->stamped_image) {
+            abort(404, 'لا توجد صورة توثيق');
+        }
+
+        $imagePath = storage_path('app/public/' . $marketerRequest->stamped_image);
+        
+        if (!file_exists($imagePath)) {
+            abort(404, 'الصورة غير موجودة');
+        }
+
+        return response()->file($imagePath);
     }
 }

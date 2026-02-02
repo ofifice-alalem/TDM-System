@@ -34,12 +34,25 @@ class WarehouseRequestController extends Controller
     {
         $request = DB::table('marketer_requests')
             ->join('users', 'marketer_requests.marketer_id', '=', 'users.id')
-            ->select('marketer_requests.*', 'users.full_name as marketer_name')
+            ->leftJoin('users as approver', 'marketer_requests.approved_by', '=', 'approver.id')
+            ->leftJoin('users as documenter', 'marketer_requests.documented_by', '=', 'documenter.id')
+            ->leftJoin('users as rejecter', 'marketer_requests.rejected_by', '=', 'rejecter.id')
+            ->select(
+                'marketer_requests.*', 
+                'users.full_name as marketer_name',
+                'approver.full_name as approver_name',
+                'documenter.full_name as documenter_name',
+                'rejecter.full_name as rejecter_name'
+            )
             ->where('marketer_requests.id', $id)
             ->first();
 
         if (!$request) {
             return response()->json(['message' => 'الطلب غير موجود'], 404);
+        }
+
+        if ($request->stamped_image) {
+            $request->stamped_image = asset('storage/' . $request->stamped_image);
         }
 
         $items = DB::table('marketer_request_items')
@@ -168,11 +181,22 @@ class WarehouseRequestController extends Controller
      */
     public function document(Request $request, $id)
     {
+        $request->validate([
+            'stamped_image' => 'required|image|max:10240'
+        ]);
+
         DB::beginTransaction();
         try {
             $marketerRequest = DB::table('marketer_requests')->where('id', $id)->where('status', 'approved')->first();
             if (!$marketerRequest) {
                 return response()->json(['message' => 'الطلب غير موجود أو غير موافق عليه'], 404);
+            }
+
+            $imagePath = null;
+            if ($request->hasFile('stamped_image')) {
+                $invoiceNumber = $marketerRequest->invoice_number;
+                $directory = "stamed_request/{$invoiceNumber}";
+                $imagePath = $request->file('stamped_image')->store($directory, 'public');
             }
 
             $items = DB::table('marketer_request_items')->where('request_id', $id)->get();
@@ -206,6 +230,7 @@ class WarehouseRequestController extends Controller
                 'status' => 'documented',
                 'documented_by' => auth()->id(),
                 'documented_at' => now(),
+                'stamped_image' => $imagePath,
                 'updated_at' => now()
             ]);
 

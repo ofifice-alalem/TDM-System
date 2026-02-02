@@ -480,7 +480,19 @@
         const grid = document.getElementById('productsGrid');
         const activeData = currentTab === 'actual' ? allData.actual : allData.reserved;
         
-        const filtered = activeData.filter(item => {
+        // Group by product_id and sum quantities
+        const groupedData = {};
+        activeData.forEach(item => {
+            if (groupedData[item.product_id]) {
+                groupedData[item.product_id].quantity += parseInt(item.quantity || 0);
+            } else {
+                groupedData[item.product_id] = { ...item, quantity: parseInt(item.quantity || 0) };
+            }
+        });
+        
+        const grouped = Object.values(groupedData);
+        
+        const filtered = grouped.filter(item => {
             const product = allData.products.find(p => p.id === item.product_id);
             if (!product) return false;
             const searchStr = `${product.name} ${product.barcode || ''}`.toLowerCase();

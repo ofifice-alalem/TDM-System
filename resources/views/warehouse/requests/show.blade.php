@@ -402,26 +402,106 @@
         background: var(--card-light);
         border-radius: 20px;
         padding: 32px;
-        max-width: 450px;
+        max-width: 550px;
         width: 90%;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         animation: slideUp 0.3s ease;
+        position: relative;
     }
 
     body.dark-mode .modal-dialog { background: var(--card-dark); }
 
+    .modal-close {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .modal-close:hover { background: rgba(0, 0, 0, 0.1); }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+
+    .modal-header svg { color: #8b5cf6; }
+
     .modal-icon {
-        width: 64px;
-        height: 64px;
+        width: 80px;
+        height: 80px;
         margin: 0 auto 20px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        background: rgba(139, 92, 246, 0.1);
     }
 
-    .modal-icon.success { background: rgba(16, 185, 129, 0.1); }
-    .modal-icon.danger { background: rgba(239, 68, 68, 0.1); }
+    .modal-icon svg { color: #8b5cf6; width: 40px; height: 40px; }
+
+    .upload-area {
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 40px 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .upload-area:hover {
+        border-color: #8b5cf6;
+        background: rgba(139, 92, 246, 0.02);
+    }
+
+    body.dark-mode .upload-area {
+        background: rgba(255, 255, 255, 0.02);
+        border-color: var(--border-dark);
+    }
+
+    .upload-text {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-light);
+        margin-top: 16px;
+    }
+
+    body.dark-mode .upload-text { color: var(--text-dark); }
+
+    .upload-hint {
+        font-size: 13px;
+        color: #9ca3af;
+        margin-top: 8px;
+    }
+
+    .warning-box {
+        background: rgba(251, 191, 36, 0.1);
+        border: 1px solid rgba(251, 191, 36, 0.2);
+        border-radius: 12px;
+        padding: 16px;
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        font-size: 13px;
+        color: #92400e;
+        line-height: 1.6;
+    }
+
+    .warning-box svg { flex-shrink: 0; color: #f59e0b; }
 
     .modal-title {
         font-size: 22px;
@@ -476,11 +556,11 @@
     }
 
     .modal-btn-primary {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
         color: white;
     }
 
-    .modal-btn-primary:hover { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+    .modal-btn-primary:hover { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); }
 
     .modal-btn-danger {
         background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
@@ -502,6 +582,86 @@
 
     .modal-btn-secondary:hover { background: #e2e8f0; }
 
+    .image-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 10000;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .image-modal-overlay.active { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+
+    .image-modal-header {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        left: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 10001;
+    }
+
+    .image-modal-title {
+        color: white;
+        font-size: 18px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .image-modal-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .image-modal-btn {
+        padding: 10px 20px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .image-modal-btn-download {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .image-modal-btn-download:hover { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+
+    .image-modal-btn-close {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .image-modal-btn-close:hover { background: rgba(255, 255, 255, 0.2); }
+
+    .image-modal-content {
+        max-width: 90%;
+        max-height: 85vh;
+        animation: slideUp 0.3s ease;
+    }
+
+    .image-modal-content img {
+        max-width: 100%;
+        max-height: 85vh;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
     @keyframes fadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
@@ -510,6 +670,86 @@
     @keyframes slideUp {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
+    }
+
+    .image-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 10000;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .image-modal-overlay.active { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+
+    .image-modal-header {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        left: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 10001;
+    }
+
+    .image-modal-title {
+        color: white;
+        font-size: 18px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .image-modal-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .image-modal-btn {
+        padding: 10px 20px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .image-modal-btn-download {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .image-modal-btn-download:hover { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+
+    .image-modal-btn-close {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .image-modal-btn-close:hover { background: rgba(255, 255, 255, 0.2); }
+
+    .image-modal-content {
+        max-width: 90%;
+        max-height: 85vh;
+        animation: slideUp 0.3s ease;
+    }
+
+    .image-modal-content img {
+        max-width: 100%;
+        max-height: 85vh;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     }
 </style>
 @endpush
@@ -561,6 +801,26 @@
             <div class="small-info-item">
                 <div class="info-label">بتاريخ</div>
                 <div class="info-value" id="sidebarDocumentedAt">-</div>
+            </div>
+        </div>
+
+        <!-- Rejection Sidebar Section -->
+        <div class="sidebar-info-card" id="rejectionSidebarSection" style="display: none; background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.1);">
+            <div class="sidebar-info-title" style="color: var(--danger);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                تم الرفض
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">بواسطة</div>
+                <div class="info-value" id="sidebarRejectedBy">-</div>
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">بتاريخ</div>
+                <div class="info-value" id="sidebarRejectedAt">-</div>
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">سبب الرفض</div>
+                <div class="info-value" id="sidebarRejectionNotes" style="font-size: 14px; line-height: 1.6; color: #ef4444;">-</div>
             </div>
         </div>
     </div>
@@ -628,16 +888,40 @@
 
 <div class="modal-overlay" id="confirmModal">
     <div class="modal-dialog">
-        <div class="modal-icon success" id="modalIcon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <button class="modal-close" onclick="closeModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">تأكيد العملية</h3>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="12" cy="12" r="1"></circle></svg>
         </div>
-        <h3 class="modal-title" id="modalTitle">تأكيد العملية</h3>
-        <p class="modal-message" id="modalMessage">هل أنت متأكد من هذا الإجراء؟</p>
-        <div id="modalInputContainer"></div>
+        <div id="modalContentArea"></div>
         <div class="modal-actions">
             <button class="modal-btn modal-btn-secondary" onclick="closeModal()">إلغاء</button>
             <button class="modal-btn modal-btn-primary" id="modalConfirmBtn" onclick="confirmAction()">تأكيد</button>
         </div>
+    </div>
+</div>
+
+<div class="image-modal-overlay" id="imageModal">
+    <div class="image-modal-header">
+        <div class="image-modal-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            صورة التوثيق
+        </div>
+        <div class="image-modal-actions">
+            <button class="image-modal-btn image-modal-btn-download" id="downloadImageBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                تنزيل
+            </button>
+            <button class="image-modal-btn image-modal-btn-close" onclick="closeImageModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                إغلاق
+            </button>
+        </div>
+    </div>
+    <div class="image-modal-content">
+        <img id="documentImage" src="" alt="صورة التوثيق">
     </div>
 </div>
 
@@ -656,29 +940,49 @@
     const requestId = '{{ $requestId }}';
     let modalCallback = null;
 
-    function showModal(title, message, type = 'success', needsInput = false) {
+    function showModal(title, message, type = 'success', needsInput = false, needsFile = false) {
         return new Promise((resolve) => {
             document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalMessage').textContent = message;
             
-            const icon = document.getElementById('modalIcon');
+            const contentArea = document.getElementById('modalContentArea');
             const confirmBtn = document.getElementById('modalConfirmBtn');
             
-            if (type === 'danger') {
-                icon.className = 'modal-icon danger';
-                icon.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
-                confirmBtn.className = 'modal-btn modal-btn-danger';
-            } else {
-                icon.className = 'modal-icon success';
-                icon.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            if (needsFile) {
+                contentArea.innerHTML = `
+                    <div class="modal-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    </div>
+                    <div class="upload-area" id="uploadArea">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        <div class="upload-text" id="uploadText">رفع صورة الفاتورة الموقعة</div>
+                        <div class="upload-hint">PNG, JPG تصل إلى 10MB</div>
+                        <input type="file" id="modalFileInput" accept="image/*" style="display:none;">
+                    </div>
+                    <div class="warning-box">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <div>يجب أن تكون الفاتورة موقعة من المسوق وتحتوي على ختم الاستلام. تفقيش المحتوى وتحديث الكميات سيتم فوراً بعد الاعتماد.</div>
+                    </div>
+                `;
+                document.querySelector('.upload-area').onclick = () => document.getElementById('modalFileInput').click();
+                document.getElementById('modalFileInput').onchange = function(e) {
+                    if (this.files && this.files[0]) {
+                        document.getElementById('uploadText').innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" style="display:inline-block; vertical-align:middle; margin-left:6px;"><polyline points="20 6 9 17 4 12"></polyline></svg> تمت معالجة الصورة';
+                        document.getElementById('uploadText').style.color = '#10b981';
+                    }
+                };
+                confirmBtn.textContent = 'إتمام التوثيق';
                 confirmBtn.className = 'modal-btn modal-btn-primary';
-            }
-            
-            const inputContainer = document.getElementById('modalInputContainer');
-            if (needsInput) {
-                inputContainer.innerHTML = '<textarea class="modal-input" id="modalInput" rows="3" placeholder="اكتب السبب هنا..."></textarea>';
+            } else if (needsInput) {
+                contentArea.innerHTML = `
+                    <p class="modal-message">${message}</p>
+                    <textarea class="modal-input" id="modalInput" rows="3" placeholder="اكتب السبب هنا..."></textarea>
+                `;
+                confirmBtn.textContent = 'تأكيد';
+                confirmBtn.className = type === 'danger' ? 'modal-btn modal-btn-danger' : 'modal-btn modal-btn-primary';
             } else {
-                inputContainer.innerHTML = '';
+                contentArea.innerHTML = `<p class="modal-message">${message}</p>`;
+                confirmBtn.textContent = 'تأكيد';
+                confirmBtn.className = type === 'danger' ? 'modal-btn modal-btn-danger' : 'modal-btn modal-btn-primary';
             }
             
             modalCallback = resolve;
@@ -693,7 +997,15 @@
 
     function confirmAction() {
         const input = document.getElementById('modalInput');
-        const value = input ? input.value : true;
+        const fileInput = document.getElementById('modalFileInput');
+        let value = true;
+        
+        if (input) {
+            value = input.value;
+        } else if (fileInput && fileInput.files && fileInput.files[0]) {
+            value = fileInput.files[0];
+        }
+        
         document.getElementById('confirmModal').classList.remove('active');
         if (modalCallback) modalCallback(value);
     }
@@ -754,6 +1066,17 @@
             }
         }
 
+        // Rejected Info
+        if (request.status === 'rejected') {
+            if (request.rejected_by && request.rejected_at) {
+                document.getElementById('rejectionSidebarSection').style.display = 'block';
+                document.getElementById('sidebarRejectedBy').textContent = request.rejecter_name || 'أمين المخزن';
+                const rejDate = new Date(request.rejected_at);
+                document.getElementById('sidebarRejectedAt').textContent = rejDate.toLocaleDateString('en-US').replace(/\//g, '-');
+                document.getElementById('sidebarRejectionNotes').textContent = request.notes || 'لا يوجد سبب';
+            }
+        }
+
         const tbody = document.getElementById('productsBody');
         if (items && items.length > 0) {
             tbody.innerHTML = items.map((item, index) => `
@@ -793,13 +1116,26 @@
 
         if (status === 'approved') {
             html += `
+                <button class="btn btn-success" onclick="documentRequest()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    توثيق الاستلام
+                </button>
                 <button class="btn btn-success" onclick="window.open('/marketer/requests/${requestId}/print', '_blank')">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                     طباعة الطلب
                 </button>
                 <button class="btn btn-danger" onclick="cancelRequest()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    رفض الطلب
+                    إلغاء الطلب
+                </button>
+            `;
+        }
+
+        if (status === 'documented') {
+            html += `
+                <button class="btn btn-success" onclick="viewDocumentation()" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    عرض التوثيق
                 </button>
             `;
         }
@@ -892,6 +1228,71 @@
             console.error('Error:', error);
             await showModal('خطأ', 'حدث خطأ أثناء رفض الطلب', 'danger');
         }
+    }
+
+    async function documentRequest() {
+        const imageFile = await showModal('توثيق الاستلام', 'يرجى رفع صورة الفاتورة الموقعة', 'success', false, true);
+        if (!imageFile) return;
+        
+        if (imageFile === true) {
+            await showModal('خطأ', 'يرجى اختيار صورة', 'danger');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('stamped_image', imageFile);
+
+        try {
+            const response = await fetch(`/api/warehouse/requests/${requestId}/document`, {
+                method: 'POST',
+                headers: { 
+                    'Authorization': 'Bearer ' + token, 
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                await showModal('تم بنجاح', 'تم توثيق استلام البضاعة بنجاح', 'success');
+                window.location.reload();
+            } else {
+                await showModal('خطأ', 'فشل توثيق الاستلام', 'danger');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            await showModal('خطأ', 'حدث خطأ أثناء التوثيق', 'danger');
+        }
+    }
+
+    async function viewDocumentation() {
+        try {
+            const response = await fetch(`/api/warehouse/requests/${requestId}`, {
+                headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+            });
+            const result = await response.json();
+            
+            if (result.data && result.data.request.stamped_image) {
+                const imageUrl = result.data.request.stamped_image;
+                document.getElementById('documentImage').src = imageUrl;
+                document.getElementById('imageModal').classList.add('active');
+                
+                document.getElementById('downloadImageBtn').onclick = function() {
+                    const link = document.createElement('a');
+                    link.href = imageUrl;
+                    link.download = `توثيق-${result.data.request.invoice_number}.png`;
+                    link.click();
+                };
+            } else {
+                await showModal('خطأ', 'لا توجد صورة توثيق متاحة', 'danger');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            await showModal('خطأ', 'حدث خطأ أثناء عرض التوثيق', 'danger');
+        }
+    }
+
+    function closeImageModal() {
+        document.getElementById('imageModal').classList.remove('active');
     }
 
     fetchRequestDetails();
