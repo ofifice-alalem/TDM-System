@@ -22,7 +22,7 @@ class MarketerWithdrawalResource extends JsonResource
             'rejected_by' => $this->rejected_by,
             'rejected_by_name' => $this->rejectedBy?->full_name,
             'rejected_at' => $this->rejected_at?->format('Y-m-d H:i:s'),
-            'signed_receipt_image' => $this->signed_receipt_image ? asset('storage/' . $this->signed_receipt_image) : null,
+            'signed_receipt_image' => $this->signed_receipt_image ? (filter_var($this->signed_receipt_image, FILTER_VALIDATE_URL) ? $this->signed_receipt_image : asset('storage/' . $this->signed_receipt_image)) : null,
             'notes' => $this->notes,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),

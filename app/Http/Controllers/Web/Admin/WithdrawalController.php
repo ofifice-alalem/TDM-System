@@ -20,18 +20,20 @@ class WithdrawalController extends Controller
         }
 
         $withdrawals = $query->get();
+        $token = $request->user()->createToken('web-token')->plainTextToken;
 
-        return view('admin.withdrawals.index', compact('withdrawals'));
+        return view('admin.withdrawals.index', compact('withdrawals', 'token'));
     }
 
-    public function show($id)
+    public function show($id, Request $request)
     {
         $withdrawal = MarketerWithdrawalRequest::with(['marketer:id,full_name', 'approvedBy:id,full_name', 'rejectedBy:id,full_name'])
             ->findOrFail($id);
 
         $availableBalance = $this->getAvailableBalance($withdrawal->marketer_id);
+        $token = $request->user()->createToken('web-token')->plainTextToken;
 
-        return view('admin.withdrawals.show', compact('withdrawal', 'availableBalance'));
+        return view('admin.withdrawals.show', compact('withdrawal', 'availableBalance', 'id', 'token'));
     }
 
     public function approve(Request $request, $id)

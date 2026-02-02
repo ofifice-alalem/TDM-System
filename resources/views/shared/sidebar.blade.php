@@ -50,6 +50,12 @@
             </span>
             <span class="nav-label">إيصالات القبض</span>
         </a>
+        <a href="/marketer/withdrawals" class="nav-link {{ request()->is('marketer/withdrawals*') ? 'active' : '' }}">
+            <span class="nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </span>
+            <span class="nav-label">سحب الأرباح</span>
+        </a>
         @endif
 
         @if(auth()->user()->role->name === 'warehouse_keeper')
@@ -76,6 +82,21 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
             </span>
             <span class="nav-label">إيصالات القبض</span>
+        </a>
+        <a href="/admin/withdrawals" class="nav-link {{ request()->is('admin/withdrawals*') ? 'active' : '' }}">
+            <span class="nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </span>
+            <span class="nav-label">طلبات السحب</span>
+        </a>
+        @endif
+
+        @if(auth()->user()->role->name === 'admin')
+        <a href="/admin/withdrawals" class="nav-link {{ request()->is('admin/withdrawals*') ? 'active' : '' }}">
+            <span class="nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </span>
+            <span class="nav-label">طلبات السحب</span>
         </a>
         @endif
     </div>

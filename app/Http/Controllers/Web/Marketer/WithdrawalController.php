@@ -18,14 +18,16 @@ class WithdrawalController extends Controller
             ->get();
 
         $availableBalance = $this->getAvailableBalance($request->user()->id);
+        $token = $request->user()->createToken('web-token')->plainTextToken;
 
-        return view('marketer.withdrawals.index', compact('withdrawals', 'availableBalance'));
+        return view('marketer.withdrawals.index', compact('withdrawals', 'availableBalance', 'token'));
     }
 
     public function create(Request $request)
     {
         $availableBalance = $this->getAvailableBalance($request->user()->id);
-        return view('marketer.withdrawals.create', compact('availableBalance'));
+        $token = $request->user()->createToken('web-token')->plainTextToken;
+        return view('marketer.withdrawals.create', compact('availableBalance', 'token'));
     }
 
     public function store(Request $request)
@@ -63,7 +65,9 @@ class WithdrawalController extends Controller
             ->with(['approvedBy:id,full_name', 'rejectedBy:id,full_name'])
             ->firstOrFail();
 
-        return view('marketer.withdrawals.show', compact('withdrawal'));
+        $token = $request->user()->createToken('web-token')->plainTextToken;
+
+        return view('marketer.withdrawals.show', compact('withdrawal', 'id', 'token'));
     }
 
     public function cancel(Request $request, $id)
