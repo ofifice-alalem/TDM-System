@@ -5,12 +5,18 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::where('is_active', true)->get();
+        $products = DB::table('products')
+            ->leftJoin('main_stock', 'products.id', '=', 'main_stock.product_id')
+            ->select('products.*', 'main_stock.quantity as main_stock_quantity')
+            ->where('products.is_active', true)
+            ->get();
+        
         return response()->json($products);
     }
 
