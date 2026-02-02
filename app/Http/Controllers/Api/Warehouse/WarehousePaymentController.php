@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Warehouse;
 
 use App\Http\Controllers\Controller;
+use App\Models\StoreDebtLedger;
+use App\Models\MarketerCommission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -64,14 +66,11 @@ class WarehousePaymentController extends Controller
                 $imagePath = $request->file('receipt_image')->store($directory, 'public');
             }
 
-            DB::table('store_debt_ledger')->insert([
+            StoreDebtLedger::create([
                 'store_id' => $payment->store_id,
                 'entry_type' => 'payment',
-                'sales_invoice_id' => null,
-                'return_id' => null,
                 'payment_id' => $id,
-                'amount' => -$payment->amount,
-                'created_at' => now()
+                'amount' => -$payment->amount
             ]);
 
             $marketer = DB::table('users')->where('id', $payment->marketer_id)->first();
@@ -79,15 +78,14 @@ class WarehousePaymentController extends Controller
             if ($marketer->commission_rate > 0) {
                 $commissionAmount = $payment->amount * ($marketer->commission_rate / 100);
 
-                DB::table('marketer_commissions')->insert([
+                MarketerCommission::create([
                     'marketer_id' => $payment->marketer_id,
                     'store_id' => $payment->store_id,
                     'keeper_id' => auth()->id(),
                     'payment_amount' => $payment->amount,
                     'payment_id' => $id,
                     'commission_rate' => $marketer->commission_rate,
-                    'commission_amount' => $commissionAmount,
-                    'created_at' => now()
+                    'commission_amount' => $commissionAmount
                 ]);
             }
 

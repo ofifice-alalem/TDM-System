@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Marketer;
 
 use App\Http\Controllers\Controller;
+use App\Models\StoreDebtLedger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -31,9 +32,7 @@ class MarketerPaymentController extends Controller
 
         DB::beginTransaction();
         try {
-            $currentDebt = DB::table('store_debt_ledger')
-                ->where('store_id', $request->store_id)
-                ->sum('amount');
+            $currentDebt = StoreDebtLedger::where('store_id', $request->store_id)->sum('amount');
 
             if ($request->amount > $currentDebt) {
                 return response()->json(['message' => 'المبلغ المسدد أكبر من الدين الحالي'], 400);
