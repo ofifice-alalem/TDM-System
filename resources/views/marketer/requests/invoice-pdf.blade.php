@@ -12,7 +12,7 @@
         }
         @font-face {
             font-family: 'Cairo';
-            src: url('{{ public_path("fonts/Cairo-Regular.ttf") }}') format('truetype');
+            src: url('{{ public_path("fonts/Cairo-Bold.ttf") }}') format('truetype');
             font-weight: bold;
             font-style: normal;
         }
@@ -25,7 +25,7 @@
         .header h1 { margin: 0; font-size: 20px; font-weight: bold; }
         .header h2 { margin: 0; font-size: 20px; font-weight: bold; color: white; }
         .info-box { background-color: #f8f9fa; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #333; text-align: right; }
-        .info-row { display: inline-block; width: 48%; margin-bottom: 4px; font-size: 11px; text-align: right; }
+        .info-row { display: inline-block; width: 48%; margin-bottom: 4px; font-size: 11px; text-align: right; font-weight: bold; }
         .label { font-weight: bold; color: #333; font-size: 11px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { background-color: #333; color: white; padding: 8px; text-align: center; font-weight: bold; font-size: 12px; }

@@ -126,25 +126,56 @@
         gap: 40px;
     }
 
-    .info-item {
+    .small-info-item {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 4px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border-light);
     }
 
-    .info-label {
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #94a3b8;
+    body.dark-mode .small-info-item {
+        border-bottom-color: var(--border-dark);
+    }
+
+    .small-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .sidebar-info-card {
+        background: rgba(16, 185, 129, 0.05);
+        padding: 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        margin-top: 20px;
+        animation: fadeInDown 0.4s ease-out;
+    }
+
+    body.dark-mode .sidebar-info-card {
+        background: rgba(16, 185, 129, 0.1);
+    }
+
+    .sidebar-info-title {
+        font-size: 14px;
         font-weight: 700;
+        color: var(--success);
+        margin-bottom: 12px;
         display: flex;
         align-items: center;
         gap: 8px;
     }
 
+    .info-label {
+        font-size: 13px;
+        color: #94a3b8;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
     .info-value {
-        font-size: 20px;
+        font-size: 16px;
         font-weight: 700;
         color: var(--text-light);
     }
@@ -352,6 +383,38 @@
             <!-- Shimmer loading state or placeholder -->
             <div style="height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; animation: pulse 1.5s infinite;"></div>
         </div>
+
+        <!-- Approval Sidebar Section -->
+        <div class="sidebar-info-card" id="approvalSidebarSection" style="display: none;">
+            <div class="sidebar-info-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                تمت الموافقة
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">بواسطة</div>
+                <div class="info-value" id="sidebarApprovedBy">-</div>
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">بتاريخ</div>
+                <div class="info-value" id="sidebarApprovedAt">-</div>
+            </div>
+        </div>
+
+        <!-- Documentation Sidebar Section -->
+        <div class="sidebar-info-card" id="documentationSidebarSection" style="display: none; background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.1);">
+            <div class="sidebar-info-title" style="color: var(--info);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                تم التوثيق
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">بواسطة</div>
+                <div class="info-value" id="sidebarDocumentedBy">-</div>
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">بتاريخ</div>
+                <div class="info-value" id="sidebarDocumentedAt">-</div>
+            </div>
+        </div>
     </div>
 
     <div class="request-content">
@@ -377,25 +440,6 @@
                         حالة الطلب
                     </div>
                     <div class="info-value"><span id="statusBadge" class="status-badge">-</span></div>
-                </div>
-                <div class="info-item" id="approvedInfo" style="display: none;">
-                    <div class="info-label">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
-                        اعتمد بواسطة
-                    </div>
-                    <div class="info-value" id="approvedBy">-</div>
-                </div>
-                <div class="info-item" id="approvedAtInfo" style="display: none;">
-                    <div class="info-label">تاريخ الاعتماد</div>
-                    <div class="info-value" id="approvedAt">-</div>
-                </div>
-                <div class="info-item" id="documentedInfo" style="display: none;">
-                    <div class="info-label">وثق بواسطة</div>
-                    <div class="info-value" id="documentedBy">-</div>
-                </div>
-                <div class="info-item" id="documentedAtInfo" style="display: none;">
-                    <div class="info-label">تاريخ التوثيق</div>
-                    <div class="info-value" id="documentedAt">-</div>
                 </div>
             </div>
         </div>
@@ -482,8 +526,8 @@
         
         const status = statusMap[request.status] || { label: request.status, class: '' };
         const createdAtDate = new Date(request.created_at);
-        const formattedDate = createdAtDate.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
-        const formattedTime = createdAtDate.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+        const formattedDate = createdAtDate.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
+        const formattedTime = createdAtDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
         
         document.getElementById('statusBadge').textContent = status.label;
         document.getElementById('statusBadge').className = `status-badge ${status.class}`;
@@ -493,21 +537,23 @@
         document.getElementById('itemsCountBadge').textContent = `${items.length} أصناف`;
 
         // Approved Info
-        if (request.approved_by && request.approved_at) {
-            document.getElementById('approvedInfo').style.display = 'flex';
-            document.getElementById('approvedAtInfo').style.display = 'flex';
-            document.getElementById('approvedBy').textContent = request.approver?.name || 'المسؤول';
-            const appDate = new Date(request.approved_at);
-            document.getElementById('approvedAt').textContent = appDate.toLocaleDateString('ar-EG');
+        if (request.status === 'approved' || request.status === 'documented') {
+            if (request.approved_by && request.approved_at) {
+                document.getElementById('approvalSidebarSection').style.display = 'block';
+                document.getElementById('sidebarApprovedBy').textContent = request.approver?.name || 'المسؤول';
+                const appDate = new Date(request.approved_at);
+                document.getElementById('sidebarApprovedAt').textContent = appDate.toLocaleDateString('en-US').replace(/\//g, '-');
+            }
         }
 
         // Documented Info
-        if (request.documented_by && request.documented_at) {
-            document.getElementById('documentedInfo').style.display = 'flex';
-            document.getElementById('documentedAtInfo').style.display = 'flex';
-            document.getElementById('documentedBy').textContent = request.documenter?.name || 'أمين المخزن';
-            const docDate = new Date(request.documented_at);
-            document.getElementById('documentedAt').textContent = docDate.toLocaleDateString('ar-EG');
+        if (request.status === 'documented') {
+            if (request.documented_by && request.documented_at) {
+                document.getElementById('documentationSidebarSection').style.display = 'block';
+                document.getElementById('sidebarDocumentedBy').textContent = request.documenter?.name || 'أمين المخزن';
+                const docDate = new Date(request.documented_at);
+                document.getElementById('sidebarDocumentedAt').textContent = docDate.toLocaleDateString('en-US').replace(/\//g, '-');
+            }
         }
 
         const tbody = document.getElementById('productsBody');
@@ -556,6 +602,10 @@
             <button class="btn btn-secondary" onclick="window.history.back()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"></path><polyline points="12 19 5 12 12 5"></polyline></svg>
                 رجوع للقائمة
+            </button>
+            <button class="btn" style="background: rgba(59, 130, 246, 0.1); color: var(--info); border: 1px solid rgba(59, 130, 246, 0.2); margin-top: 8px;" onclick="window.open('/marketer/requests/${requestId}/documentation', '_blank')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                عرض التوثيق
             </button>
         `;
 
