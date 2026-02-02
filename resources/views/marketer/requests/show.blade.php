@@ -415,6 +415,38 @@
                 <div class="info-value" id="sidebarDocumentedAt">-</div>
             </div>
         </div>
+
+        <!-- Rejection Sidebar Section -->
+        <div class="sidebar-info-card" id="rejectionSidebarSection" style="display: none; background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.1);">
+            <div class="sidebar-info-title" style="color: var(--danger);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                تم الرفض
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">بواسطة</div>
+                <div class="info-value" id="sidebarRejectedBy">-</div>
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">بتاريخ</div>
+                <div class="info-value" id="sidebarRejectedAt">-</div>
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">سبب الرفض</div>
+                <div class="info-value" id="sidebarRejectionNotes" style="font-size: 14px; line-height: 1.6; color: #ef4444;">-</div>
+            </div>
+        </div>
+
+        <!-- Cancellation Sidebar Section -->
+        <div class="sidebar-info-card" id="cancellationSidebarSection" style="display: none; background: rgba(100, 116, 139, 0.05); border-color: rgba(100, 116, 139, 0.1);">
+            <div class="sidebar-info-title" style="color: #64748b;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                تم الإلغاء
+            </div>
+            <div class="small-info-item">
+                <div class="info-label">سبب الإلغاء</div>
+                <div class="info-value" id="sidebarCancellationNotes" style="font-size: 14px; line-height: 1.6; color: #64748b;">-</div>
+            </div>
+        </div>
     </div>
 
     <div class="request-content">
@@ -553,6 +585,25 @@
                 document.getElementById('sidebarDocumentedBy').textContent = request.documenter_name || 'أمين المخزن';
                 const docDate = new Date(request.documented_at);
                 document.getElementById('sidebarDocumentedAt').textContent = docDate.toLocaleDateString('en-US').replace(/\//g, '-');
+            }
+        }
+
+        // Rejected Info
+        if (request.status === 'rejected') {
+            document.getElementById('rejectionSidebarSection').style.display = 'block';
+            document.getElementById('sidebarRejectedBy').textContent = request.rejecter_name || 'أمين المخزن';
+            if (request.rejected_at) {
+                const rejDate = new Date(request.rejected_at);
+                document.getElementById('sidebarRejectedAt').textContent = rejDate.toLocaleDateString('en-US').replace(/\//g, '-');
+            }
+            document.getElementById('sidebarRejectionNotes').textContent = request.notes || 'لا يوجد سبب';
+        }
+
+        // Cancelled Info
+        if (request.status === 'cancelled') {
+            if (request.notes) {
+                document.getElementById('cancellationSidebarSection').style.display = 'block';
+                document.getElementById('sidebarCancellationNotes').textContent = request.notes || 'لا يوجد سبب';
             }
         }
 

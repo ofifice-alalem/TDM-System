@@ -116,6 +116,14 @@ class WarehouseRequestController extends Controller
                 }
             }
 
+            DB::table('warehouse_stock_logs')->insert([
+                'invoice_type' => 'marketer_request',
+                'invoice_id' => $id,
+                'keeper_id' => auth()->id(),
+                'action' => 'withdraw',
+                'created_at' => now()
+            ]);
+
             DB::table('marketer_requests')->where('id', $id)->update([
                 'status' => 'approved',
                 'approved_by' => auth()->id(),
@@ -157,6 +165,14 @@ class WarehouseRequestController extends Controller
                         ->where('product_id', $item->product_id)
                         ->decrement('quantity', $item->quantity);
                 }
+
+                DB::table('warehouse_stock_logs')->insert([
+                    'invoice_type' => 'marketer_request',
+                    'invoice_id' => $id,
+                    'keeper_id' => auth()->id(),
+                    'action' => 'return',
+                    'created_at' => now()
+                ]);
             }
 
             DB::table('marketer_requests')->where('id', $id)->update([
@@ -234,6 +250,14 @@ class WarehouseRequestController extends Controller
                 'updated_at' => now()
             ]);
 
+            DB::table('warehouse_stock_logs')->insert([
+                'invoice_type' => 'marketer_request',
+                'invoice_id' => $id,
+                'keeper_id' => auth()->id(),
+                'action' => 'withdraw',
+                'created_at' => now()
+            ]);
+
             DB::commit();
             return response()->json(['message' => 'تم توثيق استلام البضاعة بنجاح']);
         } catch (\Exception $e) {
@@ -268,6 +292,14 @@ class WarehouseRequestController extends Controller
                         ->where('product_id', $item->product_id)
                         ->decrement('quantity', $item->quantity);
                 }
+
+                DB::table('warehouse_stock_logs')->insert([
+                    'invoice_type' => 'marketer_request',
+                    'invoice_id' => $id,
+                    'keeper_id' => auth()->id(),
+                    'action' => 'return',
+                    'created_at' => now()
+                ]);
             }
 
             DB::table('marketer_requests')->where('id', $id)->update([

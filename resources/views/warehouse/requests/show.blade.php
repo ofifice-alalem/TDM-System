@@ -1204,7 +1204,7 @@
     }
 
     async function cancelRequest() {
-        const notes = await showModal('سبب الرفض', 'يرجى إدخال سبب الرفض:', 'danger', true);
+        const notes = await showModal('إلغاء الطلب', 'يرجى إدخال سبب الإلغاء:', 'danger', true);
         if (!notes) return;
 
         try {
@@ -1219,14 +1219,14 @@
             });
 
             if (response.ok) {
-                await showModal('تم بنجاح', 'تم رفض الطلب بنجاح', 'success');
+                await showModal('تم بنجاح', 'تم إلغاء الطلب بنجاح', 'success');
                 window.location.reload();
             } else {
-                await showModal('خطأ', 'فشل رفض الطلب', 'danger');
+                await showModal('خطأ', 'فشل إلغاء الطلب', 'danger');
             }
         } catch (error) {
             console.error('Error:', error);
-            await showModal('خطأ', 'حدث خطأ أثناء رفض الطلب', 'danger');
+            await showModal('خطأ', 'حدث خطأ أثناء إلغاء الطلب', 'danger');
         }
     }
 

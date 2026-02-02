@@ -129,11 +129,45 @@ class MarketerRequestController extends Controller
      * إلغاء طلب
      * PUT /api/marketer/requests/{id}/cancel
      */
-    public function cancel($id)
+    public function cancel(Request $request, $id)
     {
-        // TODO: Implementation
-        return response()->json([
-            'message' => 'تم إلغاء الطلب بنجاح'
-        ]);
+        $request->validate(['notes' => 'nullable|string']);
+
+        DB::beginTransaction();
+        try {
+            $marketerRequest = DB::table('marketer_requests')
+                ->where('id', $id)
+                ->where('marketer_id', $request->user()->id)
+                ->first();
+
+            if (!$marketerRequest || !in_array($marketerRequest->status, ['pending', 'approved'])) {
+                return response()->json(['message' => 'الطلب غير موجود أو لا يمكن إلغاؤه'], 404);
+            }
+
+            if ($marketerRequest->status === 'approved') {
+                $items = DB::table('marketer_request_items')->where('request_id', $id)->get();
+                foreach ($items as $item) {
+                    DB::table('main_stock')->where('product_id', $item->product_id)
+                        ->increment('quantity', $item->quantity);
+
+                    DB::table('marketer_reserved_stock')
+                        ->where('marketer_id', $marketerRequest->marketer_id)
+                        ->where('product_id', $item->product_id)
+                        ->decrement('quantity', $item->quantity);
+                }
+            }
+
+            DB::table('marketer_requests')->where('id', $id)->update([
+                'status' => 'cancelled',
+                'notes' => $request->notes,
+                'updated_at' => now()
+            ]);
+
+            DB::commit();
+            return response()->json(['message' => 'تم إلغاء الطلب بنجاح']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'حدث خطأ أثناء إلغاء الطلب'], 500);
+        }
     }
 }
