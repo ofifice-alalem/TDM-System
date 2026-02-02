@@ -4,37 +4,303 @@
 
 @push('styles')
 <style>
-    .page-header { margin-bottom: 32px; }
-    .page-title { font-size: 28px; font-weight: 800; color: var(--text-light); }
+    .page-header {
+        margin-bottom: 32px;
+    }
+
+    .page-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text-light);
+        margin-bottom: 8px;
+    }
+
     body.dark-mode .page-title { color: var(--text-dark); }
-    
-    .form-card { background: var(--card-light); border-radius: 16px; padding: 32px; border: 1px solid var(--border-light); margin-bottom: 24px; }
-    body.dark-mode .form-card { background: var(--card-dark); border-color: var(--border-dark); }
-    
-    .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 8px; }
-    .form-group select, .form-group input, .form-group textarea { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-light); background: var(--bg-light); color: var(--text-light); font-family: 'Tajawal', sans-serif; }
-    body.dark-mode .form-group select, body.dark-mode .form-group input, body.dark-mode .form-group textarea { background: var(--bg-dark); border-color: var(--border-dark); color: var(--text-dark); }
-    .form-group select:focus, .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1); }
-    
-    .products-list { margin-bottom: 24px; }
-    .product-item { display: grid; grid-template-columns: 1fr 150px 80px; gap: 16px; align-items: center; padding: 20px; background: var(--bg-light); border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border-light); }
-    body.dark-mode .product-item { background: var(--bg-dark); border-color: var(--border-dark); }
-    
-    .btn-remove { padding: 10px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .btn-add-product { padding: 12px 24px; background: rgba(139, 92, 246, 0.1); color: var(--primary); border: 2px dashed var(--primary); border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    
-    .summary-card { background: rgba(139, 92, 246, 0.05); padding: 24px; border-radius: 16px; border: 1px solid rgba(139, 92, 246, 0.1); }
-    .summary-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-light); }
-    .summary-row.total { font-size: 20px; font-weight: 800; color: var(--primary); border-bottom: none; padding-top: 16px; }
-    
-    .form-actions { display: flex; gap: 16px; justify-content: flex-end; margin-top: 32px; }
-    .btn { padding: 12px 32px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-family: 'Tajawal', sans-serif; }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-secondary { background: var(--card-light); color: var(--text-light); border: 1px solid var(--border-light); }
-    body.dark-mode .btn-secondary { background: var(--card-dark); color: var(--text-dark); border-color: var(--border-dark); }
-    
-    .alert { padding: 16px; border-radius: 12px; margin-bottom: 24px; font-weight: 600; }
+
+    .page-subtitle {
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .form-card {
+        background: var(--card-light);
+        border-radius: 16px;
+        padding: 32px;
+        border: 1px solid var(--border-light);
+        margin-bottom: 24px;
+    }
+
+    body.dark-mode .form-card {
+        background: var(--card-dark);
+        border-color: var(--border-dark);
+    }
+
+    .form-section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--border-light);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    body.dark-mode .form-section-title {
+        color: var(--text-dark);
+        border-color: var(--border-dark);
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text-light);
+    }
+
+    body.dark-mode .form-group label { color: var(--text-dark); }
+
+    .form-group select,
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid var(--border-light);
+        background: var(--bg-light);
+        color: var(--text-light);
+        font-size: 14px;
+        font-family: 'Tajawal', sans-serif;
+        transition: all 0.3s ease;
+    }
+
+    body.dark-mode .form-group select,
+    body.dark-mode .form-group input,
+    body.dark-mode .form-group textarea {
+        background: var(--bg-dark);
+        border-color: var(--border-dark);
+        color: var(--text-dark);
+    }
+
+    .form-group select:focus,
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+
+    .products-list {
+        margin-bottom: 24px;
+    }
+
+    .product-item {
+        display: grid;
+        grid-template-columns: 1fr 150px 80px;
+        gap: 16px;
+        align-items: start;
+        padding: 24px;
+        background: var(--bg-light);
+        border-radius: 16px;
+        margin-bottom: 16px;
+        border: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+    }
+
+    body.dark-mode .product-item {
+        background: var(--bg-dark);
+        border-color: var(--border-dark);
+    }
+
+    .product-item:hover {
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.08);
+    }
+
+    .product-select-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .product-item select,
+    .product-item input {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 1px solid var(--border-light);
+        background: var(--card-light);
+        color: var(--text-light);
+        font-size: 14px;
+        font-family: 'Tajawal', sans-serif;
+        transition: all 0.3s ease;
+    }
+
+    body.dark-mode .product-item select,
+    body.dark-mode .product-item input {
+        background: var(--card-dark);
+        border-color: var(--border-dark);
+        color: var(--text-dark);
+    }
+
+    .product-info {
+        font-size: 12px;
+        color: #64748b;
+        display: flex;
+        gap: 16px;
+        font-weight: 600;
+        padding: 0 4px;
+    }
+
+    .product-info span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-remove {
+        padding: 8px;
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        align-self: flex-start;
+        height: 38px;
+        width: 38px;
+    }
+
+    .btn-remove:hover {
+        background: rgba(239, 68, 68, 0.2);
+        transform: scale(1.05);
+    }
+
+    .btn-remove svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .btn-add-product {
+        padding: 14px 24px;
+        background: rgba(139, 92, 246, 0.05);
+        color: var(--primary);
+        border: 2px dashed var(--primary);
+        border-radius: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        width: 100%;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-add-product:hover {
+        background: rgba(139, 92, 246, 0.1);
+        border-style: solid;
+    }
+
+    .summary-card {
+        background: var(--card-light);
+        padding: 24px;
+        border-radius: 16px;
+        border: 1px solid var(--border-light);
+        margin-bottom: 24px;
+    }
+
+    body.dark-mode .summary-card {
+        background: var(--card-dark);
+        border-color: var(--border-dark);
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border-light);
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    body.dark-mode .summary-row { border-color: var(--border-dark); }
+
+    .summary-row.total {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--primary);
+        border-bottom: none;
+        padding-top: 20px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: flex-end;
+        margin-top: 32px;
+    }
+
+    .btn {
+        padding: 14px 36px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Tajawal', sans-serif;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #7c3aed;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn-secondary {
+        background: var(--card-light);
+        color: var(--text-light);
+        border: 1px solid var(--border-light);
+    }
+
+    body.dark-mode .btn-secondary {
+        background: var(--card-dark);
+        color: var(--text-dark);
+        border-color: var(--border-dark);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(139, 92, 246, 0.05);
+    }
+
+    .alert {
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        font-weight: 600;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
     .alert-error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
     .alert-success { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
 </style>
@@ -43,11 +309,16 @@
 @section('content')
 <div class="page-header">
     <h1 class="page-title">فاتورة بيع جديدة</h1>
+    <p class="page-subtitle">قم بتسجيل عملية بيع جديدة وتحديد المتجر والمنتجات</p>
 </div>
 
 <div id="alertContainer"></div>
 
 <div class="form-card">
+    <h2 class="form-section-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        بيانات المتجر
+    </h2>
     <div class="form-group">
         <label>المتجر</label>
         <select id="storeSelect">
@@ -55,31 +326,46 @@
         </select>
     </div>
     
-    <div class="form-group">
-        <label>ملاحظات</label>
-        <textarea id="notesInput" rows="2" placeholder="ملاحظات إضافية (اختياري)"></textarea>
+    <div class="form-group" style="margin-bottom: 0;">
+        <label>ملاحظات الفاتورة</label>
+        <textarea id="notesInput" rows="2" placeholder="أدخل أي ملاحظات إضافية هنا..."></textarea>
     </div>
 </div>
 
 <div class="form-card">
-    <h3 style="margin-bottom: 20px;">المنتجات</h3>
+    <h2 class="form-section-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        المنتجات المباعة
+    </h2>
     <div class="products-list" id="productsList"></div>
     <button type="button" class="btn-add-product" onclick="addProductRow()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        إضافة منتج
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        إضافة منتج للفاتورة
     </button>
 </div>
 
 <div class="summary-card">
-    <div class="summary-row"><span>المجموع الفرعي:</span><span id="subtotalValue">0.00 د</span></div>
-    <div class="summary-row"><span>خصم المنتجات:</span><span id="productDiscountValue">0.00 د</span></div>
-    <div class="summary-row"><span>خصم الفاتورة:</span><span id="invoiceDiscountValue">0.00 د</span></div>
-    <div class="summary-row total"><span>الإجمالي:</span><span id="totalValue">0.00 د</span></div>
+    <div class="summary-row">
+        <span>المجموع الفرعي:</span>
+        <span id="subtotalValue">0.00 دينار</span>
+    </div>
+    <div class="summary-row">
+        <span>خصم المنتجات:</span>
+        <span id="productDiscountValue">0.00 دينار</span>
+    </div>
+    <div class="summary-row">
+        <span>خصم الفاتورة:</span>
+        <span id="invoiceDiscountValue">0.00 دينار</span>
+    </div>
+    <div class="summary-row total">
+        <span>الإجمالي النهائي:</span>
+        <span id="totalValue">0.00 دينار</span>
+    </div>
 </div>
 
 <div class="form-actions">
-    <button type="button" class="btn btn-secondary" onclick="window.location.href='/marketer/sales'">إلغاء</button>
-    <button type="button" class="btn btn-primary" onclick="submitInvoice()">إنشاء الفاتورة</button>
+    <button type="button" class="btn btn-secondary" onclick="window.location.href='/marketer/sales'">إلغاء العملية</button>
+    <button type="button" class="btn btn-primary" onclick="submitInvoice()">إنشاء الفاتورة الآن</button>
 </div>
 @endsection
 
@@ -96,9 +382,13 @@
                 fetch('/api/marketer/stock/actual', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }})
             ]);
             
-            stores = (await storesRes.json()).data || [];
-            const allProducts = (await productsRes.json()).data || [];
-            const stock = (await stockRes.json()).data || [];
+            const storesData = await storesRes.json();
+            const productsData = await productsRes.json();
+            const stockData = await stockRes.json();
+            
+            stores = storesData.data || storesData || [];
+            const allProducts = productsData.data || productsData || [];
+            const stock = stockData.data || stockData || [];
             
             products = allProducts.map(p => {
                 const s = stock.find(st => st.product_id === p.id);
@@ -106,9 +396,14 @@
             }).filter(p => p.stock > 0);
             
             document.getElementById('storeSelect').innerHTML = '<option value="">اختر المتجر</option>' + stores.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            
+            if (stores.length === 0) {
+                showAlert('لا توجد متاجر متاحة. يرجى إضافة متاجر أولاً من قسم المتاجر.', 'error');
+            }
+            
             addProductRow();
         } catch (error) {
-            showAlert('فشل تحميل البيانات', 'error');
+            showAlert('فشل تحميل البيانات الأساسية', 'error');
         }
     }
 
@@ -119,13 +414,25 @@
         row.className = 'product-item';
         row.id = `product-row-${id}`;
         row.innerHTML = `
-            <select class="product-select" data-id="${id}" onchange="updateRow(${id})">
-                <option value="">اختر المنتج</option>
-                ${products.map(p => `<option value="${p.id}" data-price="${p.current_price}" data-stock="${p.stock}">${p.name} - ${p.current_price} د (متوفر: ${p.stock})</option>`).join('')}
-            </select>
+            <div class="product-select-wrapper">
+                <select class="product-select" data-id="${id}" onchange="updateRow(${id})">
+                    <option value="">اختر المنتج</option>
+                    ${products.map(p => `<option value="${p.id}" data-price="${p.current_price}" data-stock="${p.stock}">${p.name} - ${parseFloat(p.current_price).toFixed(2)} د (متوفر: ${p.stock})</option>`).join('')}
+                </select>
+                <div class="product-info" id="info-${id}" style="display: none;">
+                    <span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        السعر: <span id="price-${id}">0</span> د
+                    </span>
+                    <span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                        المتوفر بمخزنك: <span id="stock-${id}">0</span>
+                    </span>
+                </div>
+            </div>
             <input type="number" class="quantity-input" data-id="${id}" placeholder="الكمية" min="1" value="1" onchange="updateSummary()">
-            <button type="button" class="btn-remove" onclick="removeProductRow(${id})">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <button type="button" class="btn-remove" onclick="removeProductRow(${id})" title="حذف المنتج">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
             </button>
         `;
         document.getElementById('productsList').appendChild(row);
@@ -135,8 +442,23 @@
         const select = document.querySelector(`.product-select[data-id="${id}"]`);
         const input = document.querySelector(`.quantity-input[data-id="${id}"]`);
         const option = select.options[select.selectedIndex];
+        const info = document.getElementById(`info-${id}`);
+        const priceSpan = document.getElementById(`price-${id}`);
+        const stockSpan = document.getElementById(`stock-${id}`);
+        
         if (option && option.value) {
-            input.setAttribute('max', option.getAttribute('data-stock'));
+            const price = option.getAttribute('data-price');
+            const stock = option.getAttribute('data-stock');
+            input.setAttribute('max', stock);
+            info.style.display = 'flex';
+            priceSpan.textContent = parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 2 });
+            stockSpan.textContent = stock;
+            
+            if (parseInt(input.value) > parseInt(stock)) {
+                input.value = stock;
+            }
+        } else {
+            info.style.display = 'none';
         }
         updateSummary();
     }
@@ -160,10 +482,11 @@
             }
         });
         
-        document.getElementById('subtotalValue').textContent = subtotal.toFixed(2) + ' د';
+        const formatter = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2 });
+        document.getElementById('subtotalValue').textContent = formatter.format(subtotal) + ' د';
         document.getElementById('productDiscountValue').textContent = '0.00 د';
         document.getElementById('invoiceDiscountValue').textContent = '0.00 د';
-        document.getElementById('totalValue').textContent = subtotal.toFixed(2) + ' د';
+        document.getElementById('totalValue').textContent = formatter.format(subtotal) + ' د';
     }
 
     async function submitInvoice() {
@@ -171,7 +494,7 @@
         const notes = document.getElementById('notesInput').value;
         
         if (!storeId) {
-            showAlert('يرجى اختيار المتجر', 'error');
+            showAlert('يرجى اختيار المتجر أولاً', 'error');
             return;
         }
         
@@ -180,16 +503,26 @@
             const select = document.querySelector(`.product-select[data-id="${id}"]`);
             const input = document.querySelector(`.quantity-input[data-id="${id}"]`);
             if (select && input && select.value) {
-                items.push({ product_id: select.value, quantity: parseInt(input.value) });
+                const qty = parseInt(input.value);
+                const max = parseInt(input.getAttribute('max'));
+                if (qty > max) {
+                    showAlert(`الكمية المطلوبة تتجاوز المتوفر (${max}) لأحد المنتجات`, 'error');
+                    return;
+                }
+                items.push({ product_id: select.value, quantity: qty });
             }
         }
         
         if (items.length === 0) {
-            showAlert('يرجى إضافة منتج واحد على الأقل', 'error');
+            showAlert('يرجى إضافة منتج واحد على الأقل للفاتورة', 'error');
             return;
         }
         
         try {
+            const btn = document.querySelector('.btn-primary');
+            btn.disabled = true;
+            btn.textContent = 'جاري الحفظ...';
+            
             const response = await fetch('/api/marketer/sales', {
                 method: 'POST',
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json', 'Content-Type': 'application/json' },
@@ -198,19 +531,26 @@
             
             const result = await response.json();
             if (response.ok) {
-                showAlert('تم إنشاء الفاتورة بنجاح', 'success');
+                showAlert('تم إنشاء فاتورة البيع بنجاح', 'success');
                 setTimeout(() => window.location.href = '/marketer/sales', 1500);
             } else {
-                showAlert(result.message || 'حدث خطأ', 'error');
+                showAlert(result.message || 'حدث خطأ غير متوقع', 'error');
+                btn.disabled = false;
+                btn.textContent = 'إنشاء الفاتورة الآن';
             }
         } catch (error) {
-            showAlert('حدث خطأ أثناء إنشاء الفاتورة', 'error');
+            showAlert('حدث خطأ في الاتصال بالخادم', 'error');
+            const btn = document.querySelector('.btn-primary');
+            btn.disabled = false;
+            btn.textContent = 'إنشاء الفاتورة الآن';
         }
     }
 
     function showAlert(message, type) {
-        document.getElementById('alertContainer').innerHTML = `<div class="alert alert-${type}">${message}</div>`;
-        setTimeout(() => document.getElementById('alertContainer').innerHTML = '', 5000);
+        const container = document.getElementById('alertContainer');
+        container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        setTimeout(() => container.innerHTML = '', 5000);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     init();
