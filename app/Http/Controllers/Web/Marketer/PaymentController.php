@@ -15,8 +15,12 @@ class PaymentController extends Controller
 
     public function create(Request $request)
     {
-        $token = $request->user()->createToken('web-token')->plainTextToken;
-        return view('marketer.payments.create', ['token' => $token]);
+        $user = $request->user();
+        $token = $user->createToken('web-token')->plainTextToken;
+        return view('marketer.payments.create', [
+            'token' => $token,
+            'commission_rate' => $user->commission_rate
+        ]);
     }
 
     public function show(Request $request, $id)

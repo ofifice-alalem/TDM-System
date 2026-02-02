@@ -152,9 +152,15 @@
 <div id="alertContainer"></div>
 
 <div class="form-card">
-    <h2 class="form-section-title">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
-        معلومات التحصيل
+    <h2 class="form-section-title" style="justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+            معلومات التحصيل
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; background: rgba(139, 92, 246, 0.1); padding: 6px 16px; border-radius: 12px; border: 1px solid rgba(139, 92, 246, 0.2);">
+            <span style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase;">نسبتك المقدرة</span>
+            <span style="font-size: 16px; font-weight: 800; color: var(--primary);" id="commissionRateDisplay">0.00%</span>
+        </div>
     </h2>
     
     <div class="form-group">
@@ -169,8 +175,17 @@
     <div class="form-group">
         <label>المبلغ المستلم</label>
         <div style="position: relative;">
-            <input type="number" id="amountInput" class="input-premium" placeholder="0.00" min="0.01" step="0.01" style="padding-left: 60px;" oninput="validateAmount()">
+            <input type="number" id="amountInput" class="input-premium" placeholder="0.00" min="0.01" step="0.01" style="padding-left: 60px;" oninput="updateCalculations()">
             <span style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-weight: 800; color: #94a3b8;">دينار</span>
+        </div>
+        <div id="marketerShareContainer" style="margin-top: 12px; display: none; animation: fadeIn 0.3s ease;">
+            <div style="background: rgba(139, 92, 246, 0.03); border: 1px dashed rgba(139, 92, 246, 0.3); border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    <span style="font-size: 13px; font-weight: 700; color: #64748b;">حصتك المقدرة من هذا المبلغ:</span>
+                </div>
+                <span id="marketerShareDisplay" style="font-size: 16px; font-weight: 800; color: var(--primary);">0.00 دينار</span>
+            </div>
         </div>
     </div>
 
@@ -215,6 +230,7 @@
 <script>
     const token = '{{ $token }}';
     let currentDebt = 0;
+    const commissionRate = parseFloat('{{ $commission_rate }}') || 0;
 
     function selectPaymentMethod(method, element) {
         document.querySelectorAll('.payment-method-card').forEach(card => card.classList.remove('active'));
@@ -222,14 +238,34 @@
         document.getElementById('paymentMethodValue').value = method;
     }
 
-    function validateAmount() {
+    function updateCalculations() {
         const amountInput = document.getElementById('amountInput');
-        const amount = parseFloat(amountInput.value);
+        const amount = parseFloat(amountInput.value) || 0;
         
+        // Validate against debt
         if (amount > currentDebt) {
             amountInput.value = currentDebt;
         }
+
+        const validAmount = parseFloat(amountInput.value) || 0;
+
+        // Calculate share
+        const share = (validAmount * commissionRate) / 100;
+        const shareDisplay = document.getElementById('marketerShareDisplay');
+        const shareContainer = document.getElementById('marketerShareContainer');
+
+        if (validAmount > 0) {
+            shareContainer.style.display = 'block';
+            shareDisplay.textContent = share.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' دينار';
+        } else {
+            shareContainer.style.display = 'none';
+        }
     }
+
+    // Initialize display
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('commissionRateDisplay').textContent = commissionRate.toFixed(2) + '%';
+    });
 
     async function fetchData() {
         try {
