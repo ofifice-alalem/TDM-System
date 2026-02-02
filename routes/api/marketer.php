@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Marketer\MarketerRequestController;
 use App\Http\Controllers\Api\Marketer\MarketerReturnController;
 use App\Http\Controllers\Api\Marketer\MarketerSalesController;
 use App\Http\Controllers\Api\Marketer\MarketerPaymentController;
+use App\Http\Controllers\Api\Marketer\MarketerWithdrawalController;
 use App\Http\Controllers\Api\Marketer\StockController;
 
 /*
@@ -53,5 +54,14 @@ Route::middleware(['auth:sanctum', 'role:salesman'])->group(function () {
     // └─────────────────────────────────────────────────────────────────┘
     Route::get('stock/actual', [StockController::class, 'actual']);
     Route::get('stock/reserved', [StockController::class, 'reserved']);
+    
+    // ┌─────────────────────────────────────────────────────────────────┐
+    // │ Marketer Withdrawals API - سحب أرباح المسوق              │
+    // └─────────────────────────────────────────────────────────────────┘
+    Route::get('withdrawals', [MarketerWithdrawalController::class, 'index']);
+    Route::post('withdrawals', [MarketerWithdrawalController::class, 'store']);
+    Route::get('withdrawals/balance', [MarketerWithdrawalController::class, 'balance']);
+    Route::get('withdrawals/{id}', [MarketerWithdrawalController::class, 'show']);
+    Route::put('withdrawals/{id}/cancel', [MarketerWithdrawalController::class, 'cancel']);
     
 });

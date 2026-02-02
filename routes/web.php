@@ -50,6 +50,10 @@ Route::middleware(['auth'])->prefix('marketer')->group(function () {
     Route::get('/payments', [App\Http\Controllers\Web\Marketer\PaymentController::class, 'index']);
     Route::get('/payments/create', [App\Http\Controllers\Web\Marketer\PaymentController::class, 'create']);
     Route::get('/payments/{id}', [App\Http\Controllers\Web\Marketer\PaymentController::class, 'show']);
+    
+    Route::get('/withdrawals', [App\Http\Controllers\Web\Marketer\WithdrawalController::class, 'index'])->name('marketer.withdrawals.index');
+    Route::get('/withdrawals/create', [App\Http\Controllers\Web\Marketer\WithdrawalController::class, 'create'])->name('marketer.withdrawals.create');
+    Route::get('/withdrawals/{id}', [App\Http\Controllers\Web\Marketer\WithdrawalController::class, 'show'])->name('marketer.withdrawals.show');
 });
 
 // Warehouse Routes
@@ -65,4 +69,10 @@ Route::middleware(['auth'])->prefix('warehouse')->group(function () {
     
     Route::get('/payments', [App\Http\Controllers\Web\Warehouse\PaymentController::class, 'index']);
     Route::get('/payments/{id}', [App\Http\Controllers\Web\Warehouse\PaymentController::class, 'show']);
+});
+
+// Admin Routes
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/withdrawals', [App\Http\Controllers\Web\Admin\WithdrawalController::class, 'index'])->name('admin.withdrawals.index');
+    Route::get('/withdrawals/{id}', [App\Http\Controllers\Web\Admin\WithdrawalController::class, 'show'])->name('admin.withdrawals.show');
 });

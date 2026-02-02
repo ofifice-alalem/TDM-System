@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\StoreController;
+use App\Http\Controllers\Api\Admin\AdminWithdrawalController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +18,12 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     
     // Stores Management  
     Route::apiResource('stores', StoreController::class);
+    
+    // Withdrawals Management
+    Route::get('withdrawals', [AdminWithdrawalController::class, 'index']);
+    Route::get('withdrawals/{id}', [AdminWithdrawalController::class, 'show']);
+    Route::post('withdrawals/{id}/approve', [AdminWithdrawalController::class, 'approve']);
+    Route::post('withdrawals/{id}/reject', [AdminWithdrawalController::class, 'reject']);
     
     // Future: Reports, Users Management, etc.
     
