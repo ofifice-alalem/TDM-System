@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\Marketer\MarketerPaymentController;
 use App\Http\Controllers\Api\Marketer\MarketerWithdrawalController;
 use App\Http\Controllers\Api\Marketer\MarketerStoreReturnController;
 use App\Http\Controllers\Api\Marketer\StockController;
+use App\Http\Controllers\Api\Marketer\PromotionController;
+use App\Http\Controllers\Api\Marketer\InvoiceDiscountController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,5 +74,15 @@ Route::middleware(['auth:sanctum', 'role:salesman'])->group(function () {
     Route::post('store-returns', [MarketerStoreReturnController::class, 'store']);
     Route::get('store-returns/{id}', [MarketerStoreReturnController::class, 'show']);
     Route::put('store-returns/{id}/cancel', [MarketerStoreReturnController::class, 'cancel']);
+    
+    // ┌─────────────────────────────────────────────────────────────────┐
+    // │ Promotions API - العروض الترويجية النشطة (قراءة فقط)    │
+    // └─────────────────────────────────────────────────────────────────┘
+    Route::get('promotions/active', [PromotionController::class, 'active']);
+    
+    // ┌─────────────────────────────────────────────────────────────────┐
+    // │ Invoice Discounts API - خصومات الفواتير النشطة (قراءة فقط) │
+    // └─────────────────────────────────────────────────────────────────┘
+    Route::get('discounts/active', [InvoiceDiscountController::class, 'active']);
     
 });

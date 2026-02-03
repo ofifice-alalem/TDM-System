@@ -164,6 +164,24 @@
         gap: 6px;
     }
 
+    .promo-badge {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
     .btn-remove {
         padding: 8px;
         background: rgba(239, 68, 68, 0.1);
@@ -376,23 +394,28 @@
 
     async function init() {
         try {
-            const [storesRes, productsRes, stockRes, discountsRes] = await Promise.all([
+            const [storesRes, productsRes, stockRes, promotionsRes, discountsRes] = await Promise.all([
                 fetch('/api/stores', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }}),
                 fetch('/api/products', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }}),
                 fetch('/api/marketer/stock/actual', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }}),
-                fetch('/api/discounts/active', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }})
+                fetch('/api/marketer/promotions/active', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }}),
+                fetch('/api/marketer/discounts/active', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }})
             ]);
             
             const storesData = await storesRes.json();
             const productsData = await productsRes.json();
             const stockData = await stockRes.json();
+            const promotionsData = await promotionsRes.json();
             const discountsData = await discountsRes.json();
             
             stores = storesData.data || storesData || [];
             const allProducts = productsData.data || productsData || [];
             const stock = stockData.data || stockData || [];
+            const allPromotions = promotionsData.data || [];
             window.discounts = discountsData.data || [];
-            window.promotions = {}; // Store promotions by product_id
+            
+            window.promotions = {};
+            allPromotions.forEach(p => window.promotions[p.product_id] = p);
             
             products = allProducts.map(p => {
                 const s = stock.find(st => st.product_id === p.id);
@@ -432,6 +455,12 @@
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
                         المتوفر بمخزنك: <span id="stock-${id}">0</span>
                     </span>
+                    <span id="promo-${id}" style="display: none;">
+                        <span class="promo-badge">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                            <span id="promo-text-${id}"></span>
+                        </span>
+                    </span>
                 </div>
             </div>
             <input type="number" class="quantity-input" data-id="${id}" placeholder="الكمية" min="1" value="1" onchange="updateSummary()">
@@ -449,20 +478,32 @@
         const info = document.getElementById(`info-${id}`);
         const priceSpan = document.getElementById(`price-${id}`);
         const stockSpan = document.getElementById(`stock-${id}`);
+        const promoSpan = document.getElementById(`promo-${id}`);
+        const promoText = document.getElementById(`promo-text-${id}`);
         
         if (option && option.value) {
             const price = option.getAttribute('data-price');
             const stock = option.getAttribute('data-stock');
+            const productId = option.value;
             input.setAttribute('max', stock);
             info.style.display = 'flex';
             priceSpan.textContent = parseFloat(price).toFixed(2);
             stockSpan.textContent = stock;
+            
+            if (window.promotions[productId]) {
+                const promo = window.promotions[productId];
+                promoSpan.style.display = 'block';
+                promoText.textContent = `🎁 اشتري ${promo.min_quantity} واحصل على ${promo.free_quantity} مجاناً`;
+            } else {
+                promoSpan.style.display = 'none';
+            }
             
             if (parseInt(input.value) > parseInt(stock)) {
                 input.value = stock;
             }
         } else {
             info.style.display = 'none';
+            promoSpan.style.display = 'none';
         }
         updateSummary();
     }
@@ -475,6 +516,8 @@
 
     function updateSummary() {
         let subtotal = 0;
+        let productDiscount = 0;
+        
         productRows.forEach(id => {
             const select = document.querySelector(`.product-select[data-id="${id}"]`);
             const input = document.querySelector(`.quantity-input[data-id="${id}"]`);
@@ -482,7 +525,18 @@
                 const option = select.options[select.selectedIndex];
                 const price = parseFloat(option.getAttribute('data-price')) || 0;
                 const qty = parseInt(input.value) || 0;
+                const productId = select.value;
+                
                 subtotal += price * qty;
+                
+                if (window.promotions && window.promotions[productId]) {
+                    const promo = window.promotions[productId];
+                    if (qty >= promo.min_quantity) {
+                        const times = Math.floor(qty / promo.min_quantity);
+                        const freeQty = times * promo.free_quantity;
+                        productDiscount += freeQty * price;
+                    }
+                }
             }
         });
         
@@ -504,7 +558,7 @@
         const total = subtotal - invoiceDiscount;
         const formatter = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2 });
         document.getElementById('subtotalValue').textContent = formatter.format(subtotal) + ' د';
-        document.getElementById('productDiscountValue').textContent = '0.00 د';
+        document.getElementById('productDiscountValue').textContent = formatter.format(productDiscount) + ' د';
         document.getElementById('invoiceDiscountValue').textContent = formatter.format(invoiceDiscount) + ' د';
         document.getElementById('totalValue').textContent = formatter.format(total) + ' د';
     }

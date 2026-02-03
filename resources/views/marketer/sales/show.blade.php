@@ -281,6 +281,7 @@
         let html = '';
 
         if (status === 'pending') {
+            html += `<button class="btn" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white;" onclick="printInvoice()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>طباعة الفاتورة</button>`;
             html += `<button class="btn btn-danger" onclick="cancelInvoice()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>إلغاء الفاتورة</button>`;
         }
 
@@ -290,6 +291,10 @@
 
         html += `<button class="btn btn-secondary" onclick="window.history.back()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"></path><polyline points="12 19 5 12 12 5"></polyline></svg>رجوع</button>`;
         container.innerHTML = html;
+    }
+
+    function printInvoice() {
+        window.open(`/marketer/sales/${invoiceId}/print`, '_blank');
     }
 
     async function cancelInvoice() {
