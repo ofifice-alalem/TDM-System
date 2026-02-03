@@ -155,7 +155,7 @@
                     <tr>
                         <th>المنتج</th>
                         <th style="width: 100px; text-align: center;">الكمية</th>
-                        <th style="width: 100px; text-align: center;">مجاني</th>
+                        <th style="width: 100px; text-align: center;">تخفيض</th>
                         <th style="width: 120px; text-align: center;">السعر</th>
                         <th style="width: 120px; text-align: center;">الإجمالي</th>
                     </tr>
@@ -304,15 +304,17 @@
 
         const tbody = document.getElementById('productsBody');
         if (items && items.length > 0) {
-            tbody.innerHTML = items.map(item => `
+            tbody.innerHTML = items.map(item => {
+                const totalQty = item.quantity + (item.free_quantity || 0);
+                return `
                 <tr>
                     <td>${item.product_name}</td>
-                    <td style="text-align: center;"><span style="background: rgba(139, 92, 246, 0.1); color: var(--primary); padding: 6px 14px; border-radius: 99px; font-weight: 800;">${item.quantity}</span></td>
+                    <td style="text-align: center;"><span style="background: rgba(139, 92, 246, 0.1); color: var(--primary); padding: 6px 14px; border-radius: 99px; font-weight: 800;">${totalQty}</span></td>
                     <td style="text-align: center;">${item.free_quantity > 0 ? `<span style="background: rgba(34, 197, 94, 0.1); color: #22c55e; padding: 6px 14px; border-radius: 99px; font-weight: 800;">${item.free_quantity}</span>` : '-'}</td>
                     <td style="text-align: center;">${parseFloat(item.unit_price).toFixed(2)} د</td>
                     <td style="text-align: center; font-weight: 800;">${parseFloat(item.total_price).toFixed(2)} د</td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         renderActions(invoice.status, invoice.stamped_invoice_image);
