@@ -46,6 +46,7 @@ Route::middleware(['auth'])->prefix('marketer')->group(function () {
     Route::get('/sales', [App\Http\Controllers\Web\Marketer\SalesController::class, 'index']);
     Route::get('/sales/create', [App\Http\Controllers\Web\Marketer\SalesController::class, 'create']);
     Route::get('/sales/{id}', [App\Http\Controllers\Web\Marketer\SalesController::class, 'show']);
+    Route::get('/sales/{id}/print', [App\Http\Controllers\Web\Marketer\SalesController::class, 'print'])->name('marketer.sales.print');
     
     Route::get('/payments', [App\Http\Controllers\Web\Marketer\PaymentController::class, 'index']);
     Route::get('/payments/create', [App\Http\Controllers\Web\Marketer\PaymentController::class, 'create']);

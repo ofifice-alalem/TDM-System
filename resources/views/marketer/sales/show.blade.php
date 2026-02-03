@@ -150,7 +150,7 @@
                     <tr>
                         <th>المنتج</th>
                         <th style="width: 100px; text-align: center;">الكمية</th>
-                        <th style="width: 100px; text-align: center;">مجاني</th>
+                        <th style="width: 100px; text-align: center;">تخفيض</th>
                         <th style="width: 120px; text-align: center;">السعر</th>
                         <th style="width: 120px; text-align: center;">الإجمالي</th>
                     </tr>

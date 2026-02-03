@@ -42,6 +42,11 @@ class SalesInvoice extends Model
         return $this->belongsTo(Store::class);
     }
 
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'keeper_id');
+    }
+
     public function keeper()
     {
         return $this->belongsTo(User::class, 'keeper_id');
