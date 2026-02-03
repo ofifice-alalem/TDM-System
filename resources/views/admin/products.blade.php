@@ -157,8 +157,8 @@
             <tr>
                 <td><small>#${p.id}</small></td>
                 <td>${p.name}</td>
-                <td class="price-cell">${parseFloat(p.price).toFixed(2)} LYD</td>
-                <td><span class="action-link" onclick="editProduct(${p.id}, '${p.name}', ${p.price})">تحرير</span></td>
+                <td class="price-cell">${parseFloat(p.current_price || 0).toFixed(2)} LYD</td>
+                <td><span class="action-link" onclick="editProduct(${p.id}, '${p.name}', ${p.current_price || 0})">تحرير</span></td>
             </tr>
         `).join('') || '<tr><td colspan="4" class="empty-row">لا يوجد بيانات</td></tr>';
     }
@@ -196,7 +196,7 @@
         
         const data = {
             name: document.getElementById('productName').value,
-            price: document.getElementById('productPrice').value,
+            current_price: document.getElementById('productPrice').value,
             description: document.getElementById('productDescription').value || null,
             barcode: document.getElementById('productBarcode').value || null
         };
