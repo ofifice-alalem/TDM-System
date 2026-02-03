@@ -77,21 +77,29 @@ class StoreDebtController extends Controller
             ->leftJoin('sales_invoices', 'store_debt_ledger.sales_invoice_id', '=', 'sales_invoices.id')
             ->leftJoin('store_payments', 'store_debt_ledger.payment_id', '=', 'store_payments.id')
             ->leftJoin('sales_returns', 'store_debt_ledger.return_id', '=', 'sales_returns.id')
-            ->leftJoin('users', function($join) {
-                $join->on('sales_invoices.marketer_id', '=', 'users.id')
-                     ->orOn('store_payments.marketer_id', '=', 'users.id')
-                     ->orOn('sales_returns.marketer_id', '=', 'users.id');
-            })
             ->where('store_debt_ledger.store_id', $id)
             ->select(
                 'store_debt_ledger.*',
                 'sales_invoices.invoice_number as sale_invoice_number',
-                'store_payments.receipt_number as payment_receipt_number',
+                'sales_invoices.marketer_id as sale_marketer_id',
+                'store_payments.payment_number as payment_receipt_number',
+                'store_payments.marketer_id as payment_marketer_id',
                 'sales_returns.return_number as return_number',
-                'users.full_name as marketer_name'
+                'sales_returns.marketer_id as return_marketer_id'
             )
             ->orderBy('store_debt_ledger.created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function($item) {
+                $marketerId = $item->sale_marketer_id ?? $item->payment_marketer_id ?? $item->return_marketer_id;
+                $marketerName = null;
+                if ($marketerId) {
+                    $marketer = DB::table('users')->where('id', $marketerId)->first();
+                    $marketerName = $marketer ? $marketer->full_name : null;
+                }
+                $item->marketer_name = $marketerName;
+                unset($item->sale_marketer_id, $item->payment_marketer_id, $item->return_marketer_id);
+                return $item;
+            });
 
         return response()->json([
             'message' => 'تفاصيل المتجر',
