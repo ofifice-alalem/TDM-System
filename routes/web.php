@@ -86,3 +86,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/sales', [App\Http\Controllers\Web\Admin\SalesController::class, 'index'])->name('admin.sales.index');
     Route::get('/sales/{id}', [App\Http\Controllers\Web\Admin\SalesController::class, 'show'])->name('admin.sales.show');
 });
+
+// Stores Routes (Shared for all users)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/stores', [App\Http\Controllers\Web\StoreDebtController::class, 'index'])->name('stores.index');
+    Route::get('/stores/{id}', [App\Http\Controllers\Web\StoreDebtController::class, 'show'])->name('stores.show');
+});
