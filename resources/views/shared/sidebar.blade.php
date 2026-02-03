@@ -56,6 +56,12 @@
             </span>
             <span class="nav-label">سحب الأرباح</span>
         </a>
+        <a href="/marketer/store-returns" class="nav-link {{ request()->is('marketer/store-returns*') ? 'active' : '' }}">
+            <span class="nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg>
+            </span>
+            <span class="nav-label">إرجاع من المتاجر</span>
+        </a>
         @endif
 
         @if(auth()->user()->role->name === 'warehouse_keeper')
@@ -82,6 +88,12 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
             </span>
             <span class="nav-label">إيصالات القبض</span>
+        </a>
+        <a href="/warehouse/store-returns" class="nav-link {{ request()->is('warehouse/store-returns*') ? 'active' : '' }}">
+            <span class="nav-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg>
+            </span>
+            <span class="nav-label">إرجاع من المتاجر</span>
         </a>
         <a href="/admin/withdrawals" class="nav-link {{ request()->is('admin/withdrawals*') ? 'active' : '' }}">
             <span class="nav-icon">

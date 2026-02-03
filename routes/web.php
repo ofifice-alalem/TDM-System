@@ -54,6 +54,10 @@ Route::middleware(['auth'])->prefix('marketer')->group(function () {
     Route::get('/withdrawals', [App\Http\Controllers\Web\Marketer\WithdrawalController::class, 'index'])->name('marketer.withdrawals.index');
     Route::get('/withdrawals/create', [App\Http\Controllers\Web\Marketer\WithdrawalController::class, 'create'])->name('marketer.withdrawals.create');
     Route::get('/withdrawals/{id}', [App\Http\Controllers\Web\Marketer\WithdrawalController::class, 'show'])->name('marketer.withdrawals.show');
+    
+    Route::get('/store-returns', [App\Http\Controllers\Web\Marketer\StoreReturnController::class, 'index'])->name('marketer.store-returns.index');
+    Route::get('/store-returns/create', [App\Http\Controllers\Web\Marketer\StoreReturnController::class, 'create'])->name('marketer.store-returns.create');
+    Route::get('/store-returns/{id}', [App\Http\Controllers\Web\Marketer\StoreReturnController::class, 'show'])->name('marketer.store-returns.show');
 });
 
 // Warehouse Routes
@@ -69,6 +73,9 @@ Route::middleware(['auth'])->prefix('warehouse')->group(function () {
     
     Route::get('/payments', [App\Http\Controllers\Web\Warehouse\PaymentController::class, 'index']);
     Route::get('/payments/{id}', [App\Http\Controllers\Web\Warehouse\PaymentController::class, 'show']);
+    
+    Route::get('/store-returns', [App\Http\Controllers\Web\Warehouse\StoreReturnController::class, 'index'])->name('warehouse.store-returns.index');
+    Route::get('/store-returns/{id}', [App\Http\Controllers\Web\Warehouse\StoreReturnController::class, 'show'])->name('warehouse.store-returns.show');
 });
 
 // Admin Routes

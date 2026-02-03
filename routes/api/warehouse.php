@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Warehouse\WarehouseRequestController;
 use App\Http\Controllers\Api\Warehouse\WarehouseReturnController;
 use App\Http\Controllers\Api\Warehouse\WarehouseSalesController;
 use App\Http\Controllers\Api\Warehouse\WarehousePaymentController;
+use App\Http\Controllers\Api\Warehouse\WarehouseStoreReturnController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,5 +49,13 @@ Route::middleware(['auth:sanctum', 'role:warehouse_keeper'])->group(function () 
     Route::get('payments/{id}', [WarehousePaymentController::class, 'show']);
     Route::post('payments/{id}/approve', [WarehousePaymentController::class, 'approve']);
     Route::put('payments/{id}/reject', [WarehousePaymentController::class, 'reject']);
+    
+    // ┌─────────────────────────────────────────────────────────────────┐
+    // │ Store Returns API - إدارة إرجاع بضاعة من المتجر              │
+    // └─────────────────────────────────────────────────────────────────┘
+    Route::get('store-returns', [WarehouseStoreReturnController::class, 'index']);
+    Route::get('store-returns/{id}', [WarehouseStoreReturnController::class, 'show']);
+    Route::post('store-returns/{id}/approve', [WarehouseStoreReturnController::class, 'approve']);
+    Route::put('store-returns/{id}/reject', [WarehouseStoreReturnController::class, 'reject']);
     
 });

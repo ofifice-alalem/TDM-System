@@ -10,14 +10,18 @@ class MarketerSalesController extends Controller
 {
     public function index(Request $request)
     {
-        $invoices = DB::table('sales_invoices')
+        $query = DB::table('sales_invoices')
             ->join('stores', 'sales_invoices.store_id', '=', 'stores.id')
             ->where('sales_invoices.marketer_id', $request->user()->id)
-            ->select('sales_invoices.*', 'stores.name as store_name')
-            ->orderBy('sales_invoices.created_at', 'desc')
-            ->get();
+            ->select('sales_invoices.*', 'stores.name as store_name');
 
-        return response()->json(['message' => 'قائمة فواتير البيع', 'data' => $invoices]);
+        if ($request->has('status')) {
+            $query->where('sales_invoices.status', $request->status);
+        }
+
+        $invoices = $query->orderBy('sales_invoices.created_at', 'desc')->get();
+
+        return response()->json(['message', 'data' => $invoices]);
     }
 
     public function store(Request $request)

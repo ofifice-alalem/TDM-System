@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Marketer\MarketerReturnController;
 use App\Http\Controllers\Api\Marketer\MarketerSalesController;
 use App\Http\Controllers\Api\Marketer\MarketerPaymentController;
 use App\Http\Controllers\Api\Marketer\MarketerWithdrawalController;
+use App\Http\Controllers\Api\Marketer\MarketerStoreReturnController;
 use App\Http\Controllers\Api\Marketer\StockController;
 
 /*
@@ -63,5 +64,13 @@ Route::middleware(['auth:sanctum', 'role:salesman'])->group(function () {
     Route::get('withdrawals/balance', [MarketerWithdrawalController::class, 'balance']);
     Route::get('withdrawals/{id}', [MarketerWithdrawalController::class, 'show']);
     Route::put('withdrawals/{id}/cancel', [MarketerWithdrawalController::class, 'cancel']);
+    
+    // ┌─────────────────────────────────────────────────────────────────┐
+    // │ Store Returns API - إرجاع بضاعة من المتجر              │
+    // └─────────────────────────────────────────────────────────────────┘
+    Route::get('store-returns', [MarketerStoreReturnController::class, 'index']);
+    Route::post('store-returns', [MarketerStoreReturnController::class, 'store']);
+    Route::get('store-returns/{id}', [MarketerStoreReturnController::class, 'show']);
+    Route::put('store-returns/{id}/cancel', [MarketerStoreReturnController::class, 'cancel']);
     
 });
