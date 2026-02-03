@@ -12,24 +12,54 @@ class ProductController extends Controller
     public function index()
     {
         $products = DB::table('products')
-            ->leftJoin('main_stock', 'products.id', '=', 'main_stock.product_id')
-            ->select('products.*', 'main_stock.quantity as main_stock_quantity')
-            ->where('products.is_active', true)
+            ->select('id', 'name', 'current_price as price')
+            ->where('is_active', true)
             ->get();
         
-        return response()->json($products);
+        return response()->json(['data' => $products]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:100',
+            'price' => 'required|numeric|min:0',
+            'description' => 'nullable|string|max:255',
             'barcode' => 'nullable|string|max:50',
-            'description' => 'nullable|string',
-            'current_price' => 'required|numeric|min:0',
         ]);
 
-        $product = Product::create($validated);
-        return response()->json($product, 201);
+        $product = DB::table('products')->insertGetId([
+            'name' => $validated['name'],
+            'current_price' => $validated['price'],
+            'description' => $validated['description'],
+            'barcode' => $validated['barcode'],
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+        
+        return response()->json(['message' => 'تم إضافة المنتج بنجاح'], 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'price' => 'required|numeric|min:0',
+            'description' => 'nullable|string|max:255',
+            'barcode' => 'nullable|string|max:50',
+        ]);
+
+        DB::table('products')
+            ->where('id', $id)
+            ->update([
+                'name' => $validated['name'],
+                'current_price' => $validated['price'],
+                'description' => $validated['description'],
+                'barcode' => $validated['barcode'],
+                'updated_at' => now()
+            ]);
+        
+        return response()->json(['message' => 'تم تحديث المنتج بنجاح']);
     }
 }

@@ -85,6 +85,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/marketers', [App\Http\Controllers\Web\Admin\MarketerController::class, 'index'])->name('admin.marketers.index');
     Route::get('/sales', [App\Http\Controllers\Web\Admin\SalesController::class, 'index'])->name('admin.sales.index');
     Route::get('/sales/{id}', [App\Http\Controllers\Web\Admin\SalesController::class, 'show'])->name('admin.sales.show');
+    Route::get('/products', function() {
+        $token = request()->user()->createToken('web-token')->plainTextToken;
+        return view('admin.products', ['token' => $token]);
+    })->name('admin.products');
 });
 
 // Stores Routes (Shared for all users)
