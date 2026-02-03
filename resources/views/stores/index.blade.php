@@ -58,7 +58,7 @@
     
     @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @media (max-width: 1024px) { .stores-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 1200px) { .stores-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) { .stores-grid { grid-template-columns: 1fr; } }
 </style>
 @endpush
