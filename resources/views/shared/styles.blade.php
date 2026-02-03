@@ -109,4 +109,52 @@
     ::-webkit-scrollbar-thumb:hover {
         background: #94a3b8;
     }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 9999; }
+    .modal-overlay.show { display: flex; }
+    .modal-box { background: var(--card-light); border-radius: 20px; padding: 32px; max-width: 400px; width: 90%; box-shadow: var(--shadow-lg); }
+    body.dark-mode .modal-box { background: var(--card-dark); }
+    .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 16px; color: var(--text-light); }
+    body.dark-mode .modal-title { color: var(--text-dark); }
+    .modal-message { font-size: 14px; color: #64748b; margin-bottom: 24px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+    .modal-btn { padding: 10px 20px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-family: 'Tajawal', sans-serif; }
+    .modal-btn-primary { background: var(--primary); color: white; }
+    .modal-btn-secondary { background: rgba(100, 116, 139, 0.1); color: #64748b; }
 </style>
+
+<div id="modalOverlay" class="modal-overlay" onclick="if(event.target === this) closeModal()">
+    <div class="modal-box">
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-message" id="modalMessage"></div>
+        <div class="modal-actions" id="modalActions"></div>
+    </div>
+</div>
+
+<script>
+    function showModal(title, message, onConfirm) {
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalMessage').textContent = message;
+        const actions = document.getElementById('modalActions');
+        actions.innerHTML = `<button class="modal-btn modal-btn-primary" onclick="closeModal(); ${onConfirm ? 'modalCallback()' : ''}">حسناً</button>`;
+        if (onConfirm) window.modalCallback = onConfirm;
+        document.getElementById('modalOverlay').classList.add('show');
+    }
+
+    function showConfirm(message, onConfirm) {
+        document.getElementById('modalTitle').textContent = 'تأكيد';
+        document.getElementById('modalMessage').textContent = message;
+        const actions = document.getElementById('modalActions');
+        actions.innerHTML = `
+            <button class="modal-btn modal-btn-secondary" onclick="closeModal()">إلغاء</button>
+            <button class="modal-btn modal-btn-primary" onclick="closeModal(); modalCallback()">تأكيد</button>
+        `;
+        window.modalCallback = onConfirm;
+        document.getElementById('modalOverlay').classList.add('show');
+    }
+
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('show');
+    }
+</script>

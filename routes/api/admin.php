@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\Admin\AdminWithdrawalController;
 use App\Http\Controllers\Api\Admin\AdminMarketerController;
 use App\Http\Controllers\Api\Admin\AdminSalesController;
+use App\Http\Controllers\Api\Admin\InvoiceDiscountController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,6 +36,13 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::get('sales', [AdminSalesController::class, 'index']);
     Route::get('sales/{id}', [AdminSalesController::class, 'show']);
     Route::get('sales/{id}/rejection', [AdminSalesController::class, 'getRejection']);
+    
+    // Invoice Discounts Management
+    Route::get('discounts', [InvoiceDiscountController::class, 'index']);
+    Route::post('discounts', [InvoiceDiscountController::class, 'store']);
+    Route::get('discounts/{id}', [InvoiceDiscountController::class, 'show']);
+    Route::put('discounts/{id}/toggle', [InvoiceDiscountController::class, 'toggleActive']);
+    Route::delete('discounts/{id}', [InvoiceDiscountController::class, 'destroy']);
     
     // Future: Reports, Users Management, etc.
     

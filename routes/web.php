@@ -93,6 +93,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         $token = request()->user()->createToken('web-token')->plainTextToken;
         return view('admin.users', ['token' => $token]);
     })->name('admin.users');
+    Route::get('/discounts', [App\Http\Controllers\Web\Admin\InvoiceDiscountController::class, 'index'])->name('admin.discounts.index');
+    Route::get('/discounts/create', [App\Http\Controllers\Web\Admin\InvoiceDiscountController::class, 'create'])->name('admin.discounts.create');
 });
 
 // Stores Routes (Shared for all users)

@@ -12,8 +12,9 @@ class ProductController extends Controller
     public function index()
     {
         $products = DB::table('products')
-            ->select('id', 'name', 'current_price as price')
-            ->where('is_active', true)
+            ->leftJoin('main_stock', 'products.id', '=', 'main_stock.product_id')
+            ->select('products.id', 'products.name', 'products.current_price', 'products.description', 'products.barcode', 'products.is_active', 'main_stock.quantity as main_stock_quantity')
+            ->where('products.is_active', true)
             ->get();
         
         return response()->json(['data' => $products]);

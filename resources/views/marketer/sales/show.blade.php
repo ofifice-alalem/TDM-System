@@ -75,6 +75,28 @@
         <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 24px;">الإجراءات</h3>
         <div id="actionsContainer" style="display: flex; flex-direction: column; gap: 16px;"></div>
         
+        <div style="background: rgba(139, 92, 246, 0.05); padding: 20px; border-radius: 16px; border: 1px solid rgba(139, 92, 246, 0.1); margin-top: 20px;">
+            <div style="font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 16px;">تفاصيل الفاتورة</div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
+                    <span style="font-size: 13px; color: #64748b; font-weight: 600;">المجموع الفرعي</span>
+                    <span style="font-size: 14px; font-weight: 700; color: var(--text-light);" id="subtotalSidebar">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
+                    <span style="font-size: 13px; color: #64748b; font-weight: 600;">خصم المنتجات</span>
+                    <span style="font-size: 14px; font-weight: 700; color: #22c55e;" id="productDiscountSidebar">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
+                    <span style="font-size: 13px; color: #64748b; font-weight: 600;">خصم الفاتورة</span>
+                    <span style="font-size: 14px; font-weight: 700; color: #f59e0b;" id="invoiceDiscountSidebar">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                    <span style="font-size: 14px; color: var(--primary); font-weight: 700;">الإجمالي النهائي</span>
+                    <span style="font-size: 16px; font-weight: 800; color: var(--primary);" id="totalSidebar">-</span>
+                </div>
+            </div>
+        </div>
+        
         <div id="approvalSection" style="display: none; background: rgba(59, 130, 246, 0.05); padding: 16px; border-radius: 16px; border: 1px solid rgba(59, 130, 246, 0.1); margin-top: 20px;">
             <div style="font-size: 14px; font-weight: 700; color: #3b82f6; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -221,6 +243,12 @@
         document.getElementById('storeName').textContent = invoice.store_name || '---';
         document.getElementById('createdAt').textContent = new Date(invoice.created_at).toLocaleDateString('en-US').replace(/\//g, '-');
         document.getElementById('totalAmount').textContent = parseFloat(invoice.total_amount).toFixed(2) + ' د';
+        
+        // Update sidebar details
+        document.getElementById('subtotalSidebar').textContent = parseFloat(invoice.subtotal || 0).toFixed(2) + ' د';
+        document.getElementById('productDiscountSidebar').textContent = parseFloat(invoice.product_discount || 0).toFixed(2) + ' د';
+        document.getElementById('invoiceDiscountSidebar').textContent = parseFloat(invoice.invoice_discount_amount || 0).toFixed(2) + ' د';
+        document.getElementById('totalSidebar').textContent = parseFloat(invoice.total_amount).toFixed(2) + ' د';
 
         if (invoice.status === 'approved' && invoice.keeper_name) {
             document.getElementById('approvalSection').style.display = 'block';

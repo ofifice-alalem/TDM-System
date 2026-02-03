@@ -376,23 +376,27 @@
 
     async function init() {
         try {
-            const [storesRes, productsRes, stockRes] = await Promise.all([
+            const [storesRes, productsRes, stockRes, discountsRes] = await Promise.all([
                 fetch('/api/stores', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }}),
                 fetch('/api/products', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }}),
-                fetch('/api/marketer/stock/actual', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }})
+                fetch('/api/marketer/stock/actual', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }}),
+                fetch('/api/discounts/active', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }})
             ]);
             
             const storesData = await storesRes.json();
             const productsData = await productsRes.json();
             const stockData = await stockRes.json();
+            const discountsData = await discountsRes.json();
             
             stores = storesData.data || storesData || [];
             const allProducts = productsData.data || productsData || [];
             const stock = stockData.data || stockData || [];
+            window.discounts = discountsData.data || [];
+            window.promotions = {}; // Store promotions by product_id
             
             products = allProducts.map(p => {
                 const s = stock.find(st => st.product_id === p.id);
-                return { ...p, stock: s ? s.quantity : 0 };
+                return { ...p, current_price: p.price || p.current_price, stock: s ? s.quantity : 0 };
             }).filter(p => p.stock > 0);
             
             document.getElementById('storeSelect').innerHTML = '<option value="">اختر المتجر</option>' + stores.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
@@ -451,7 +455,7 @@
             const stock = option.getAttribute('data-stock');
             input.setAttribute('max', stock);
             info.style.display = 'flex';
-            priceSpan.textContent = parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 2 });
+            priceSpan.textContent = parseFloat(price).toFixed(2);
             stockSpan.textContent = stock;
             
             if (parseInt(input.value) > parseInt(stock)) {
@@ -482,11 +486,27 @@
             }
         });
         
+        let invoiceDiscount = 0;
+        if (window.discounts && subtotal > 0) {
+            const applicable = window.discounts
+                .filter(d => parseFloat(d.min_amount) <= subtotal)
+                .sort((a, b) => parseFloat(b.min_amount) - parseFloat(a.min_amount))[0];
+            
+            if (applicable) {
+                if (applicable.discount_type === 'percentage') {
+                    invoiceDiscount = subtotal * (parseFloat(applicable.discount_percentage) / 100);
+                } else {
+                    invoiceDiscount = parseFloat(applicable.discount_amount);
+                }
+            }
+        }
+        
+        const total = subtotal - invoiceDiscount;
         const formatter = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2 });
         document.getElementById('subtotalValue').textContent = formatter.format(subtotal) + ' د';
         document.getElementById('productDiscountValue').textContent = '0.00 د';
-        document.getElementById('invoiceDiscountValue').textContent = '0.00 د';
-        document.getElementById('totalValue').textContent = formatter.format(subtotal) + ' د';
+        document.getElementById('invoiceDiscountValue').textContent = formatter.format(invoiceDiscount) + ' د';
+        document.getElementById('totalValue').textContent = formatter.format(total) + ' د';
     }
 
     async function submitInvoice() {

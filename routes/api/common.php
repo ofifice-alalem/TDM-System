@@ -30,6 +30,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->get();
         return response()->json(['data' => $stock]);
     });
+    
+    // Active Invoice Discounts (accessible by all authenticated users)
+    Route::get('/discounts/active', function() {
+        $discounts = \DB::table('invoice_discount_tiers')
+            ->where('is_active', true)
+            ->whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now())
+            ->orderBy('min_amount', 'desc')
+            ->get();
+        return response()->json(['data' => $discounts]);
+    });
 });
 
 // Store Debts Routes (temporary without auth for testing)
