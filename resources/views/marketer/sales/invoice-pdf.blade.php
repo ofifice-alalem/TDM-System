@@ -28,15 +28,18 @@
         .info-row { display: inline-block; width: 48%; margin-bottom: 3px; font-size: 12px; text-align: right; font-weight: bold; }
         .label { font-weight: bold; color: #333; font-size: 12px; }
         table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-        th { background-color: #333; color: white; padding: 6px; text-align: center; font-weight: bold; font-size: 13px; }
-        td { border: 1px solid #333; padding: 5px; background-color: #ffffff; font-size: 12px; text-align: center; }
+        th { background-color: #333; color: white; padding: 4px; text-align: center; font-weight: bold; font-size: 12px; }
+        td { border: 1px solid #333; padding: 3px; background-color: #ffffff; font-size: 11px; text-align: center; }
         td.product-name { text-align: right; padding-right: 8px; }
         td.quantity { font-family: 'DejaVu Sans', sans-serif; direction: ltr; }
         td.price { font-family: 'DejaVu Sans', sans-serif; direction: ltr; }
         tr:nth-child(even) td { background-color: #f5f5f5; }
-        .summary-box { margin-top: 10px; background-color: #f8f9fa; padding: 8px; border-radius: 4px; border: 1px solid #333; }
-        .summary-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; font-weight: bold; }
-        .summary-row.total { font-size: 14px; color: #333; border-top: 2px solid #333; padding-top: 6px; margin-top: 4px; }
+        .summary-box { margin-top: 10px; background-color: #f8f9fa; padding: 6px 8px; border-radius: 4px; border: 1px solid #333; }
+        .summary-row { padding: 3px 0; font-size: 11px; font-weight: bold; }
+        .summary-row::after { content: ""; display: table; clear: both; }
+        .summary-row span:first-child { float: right; }
+        .summary-row span:last-child { float: left; }
+        .summary-row.total { font-size: 13px; color: #333; border-top: 2px solid #333; padding-top: 5px; margin-top: 3px; }
         .signatures { position: fixed; bottom: 10px; left: 10px; right: 10px; }
         .signature-box { display: inline-block; width: 30%; text-align: center; border-top: 1px solid #000; padding-top: 15px; margin: 0 1.5%; font-size: 11px; }
     </style>
@@ -98,23 +101,23 @@
 
     <div class="summary-box">
         <div class="summary-row">
-            <span>{{ $labels['subtotal'] }}:</span>
+            <span>{{ $labels['subtotal'] }}</span>
             <span class="price">{{ number_format($subtotal, 2) }} {{ $labels['currency'] }}</span>
         </div>
         @if($productDiscount > 0)
         <div class="summary-row">
-            <span>{{ $labels['productDiscount'] }}:</span>
+            <span>{{ $labels['productDiscount'] }}</span>
             <span class="price">{{ number_format($productDiscount, 2) }} {{ $labels['currency'] }}</span>
         </div>
         @endif
         @if($invoiceDiscount > 0)
         <div class="summary-row">
-            <span>{{ $labels['invoiceDiscount'] }}:</span>
+            <span>{{ $labels['invoiceDiscount'] }}</span>
             <span class="price">{{ number_format($invoiceDiscount, 2) }} {{ $labels['currency'] }}</span>
         </div>
         @endif
         <div class="summary-row total">
-            <span>{{ $labels['finalTotal'] }}:</span>
+            <span>{{ $labels['finalTotal'] }}</span>
             <span class="price">{{ number_format($finalTotal, 2) }} {{ $labels['currency'] }}</span>
         </div>
     </div>

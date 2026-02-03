@@ -40,7 +40,8 @@ class SalesController extends Controller
         };
 
         $subtotal = $invoice->items->sum(function($item) {
-            return $item->quantity * $item->unit_price;
+            $freeQty = $item->free_quantity ?? 0;
+            return ($item->quantity + $freeQty) * $item->unit_price;
         });
 
         $data = [
@@ -54,13 +55,13 @@ class SalesController extends Controller
             'items' => $invoice->items->map(function($item) use ($arabic, $toEnglishNumbers) {
                 $freeQty = $item->free_quantity ?? 0;
                 $totalQty = $item->quantity + $freeQty;
-                $totalWithoutFree = $item->quantity * $item->unit_price;
+                $totalWithFree = $totalQty * $item->unit_price;
                 return (object)[
                     'name' => $toEnglishNumbers($arabic->utf8Glyphs($item->product->name)),
                     'totalQty' => $totalQty,
                     'discount' => $freeQty,
                     'price' => $item->unit_price,
-                    'total' => $totalWithoutFree
+                    'total' => $totalWithFree
                 ];
             }),
             'subtotal' => $subtotal,
