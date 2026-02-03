@@ -89,6 +89,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         $token = request()->user()->createToken('web-token')->plainTextToken;
         return view('admin.products', ['token' => $token]);
     })->name('admin.products');
+    Route::get('/users', function() {
+        $token = request()->user()->createToken('web-token')->plainTextToken;
+        return view('admin.users', ['token' => $token]);
+    })->name('admin.users');
 });
 
 // Stores Routes (Shared for all users)
