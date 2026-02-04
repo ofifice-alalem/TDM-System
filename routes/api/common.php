@@ -6,12 +6,14 @@ use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\StoreDebtController;
 use App\Http\Controllers\Api\UserController;
 
+// Products without auth (for testing)
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/stores', [StoreController::class, 'index']);
+
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/products', [ProductController::class, 'index']);
     Route::post('/products', [ProductController::class, 'store']);
     Route::put('/products/{id}', [ProductController::class, 'update']);
     
-    Route::get('/stores', [StoreController::class, 'index']);
     Route::post('/stores', [StoreController::class, 'store']);
     Route::get('/stores/{id}/debt', [StoreController::class, 'getDebt']);
     
