@@ -9,9 +9,18 @@ use Illuminate\Support\Facades\DB;
 
 class StoreController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $stores = Store::where('is_active', true)->get();
+        $query = Store::query();
+        
+        // Filter by active status
+        if ($request->has('is_active')) {
+            $query->where('is_active', $request->is_active);
+        } else {
+            $query->where('is_active', true);
+        }
+        
+        $stores = $query->get();
         return response()->json($stores);
     }
 

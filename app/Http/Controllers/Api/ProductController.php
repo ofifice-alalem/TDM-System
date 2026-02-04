@@ -9,13 +9,20 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = DB::table('products')
+        $query = DB::table('products')
             ->leftJoin('main_stock', 'products.id', '=', 'main_stock.product_id')
-            ->select('products.id', 'products.name', 'products.current_price', 'products.description', 'products.barcode', 'products.is_active', 'main_stock.quantity as main_stock_quantity')
-            ->where('products.is_active', true)
-            ->get();
+            ->select('products.id', 'products.name', 'products.current_price', 'products.description', 'products.barcode', 'products.is_active', 'main_stock.quantity as main_stock_quantity');
+        
+        // Filter by active status
+        if ($request->has('is_active')) {
+            $query->where('products.is_active', $request->is_active);
+        } else {
+            $query->where('products.is_active', true);
+        }
+        
+        $products = $query->get();
         
         return response()->json(['data' => $products]);
     }

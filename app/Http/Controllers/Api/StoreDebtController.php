@@ -8,11 +8,16 @@ use Illuminate\Support\Facades\DB;
 
 class StoreDebtController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $stores = DB::table('stores')
-            ->select('stores.*')
-            ->get()
+        $query = DB::table('stores')->select('stores.*');
+        
+        // Filter by active status
+        if ($request->has('is_active')) {
+            $query->where('stores.is_active', $request->is_active);
+        }
+        
+        $stores = $query->get()
             ->map(function($store) {
                 $totalSales = DB::table('store_debt_ledger')
                     ->where('store_id', $store->id)

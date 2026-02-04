@@ -32,21 +32,32 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/roles', [UserController::class, 'getRoles']);
     });
     
-    Route::get('/warehouse/main-stock', function() {
-        $stock = \DB::table('main_stock')
-            ->select('product_id', 'quantity')
-            ->get();
+    Route::get('/warehouse/main-stock', function(\Illuminate\Http\Request $request) {
+        $query = \DB::table('main_stock')
+            ->select('product_id', 'quantity');
+        
+        // Filter by product_id
+        if ($request->has('product_id')) {
+            $query->where('product_id', $request->product_id);
+        }
+        
+        $stock = $query->get();
         return response()->json(['data' => $stock]);
     });
     
     // Active Invoice Discounts (accessible by all authenticated users)
-    Route::get('/discounts/active', function() {
-        $discounts = \DB::table('invoice_discount_tiers')
+    Route::get('/discounts/active', function(\Illuminate\Http\Request $request) {
+        $query = \DB::table('invoice_discount_tiers')
             ->where('is_active', true)
             ->whereDate('start_date', '<=', now())
-            ->whereDate('end_date', '>=', now())
-            ->orderBy('min_amount', 'desc')
-            ->get();
+            ->whereDate('end_date', '>=', now());
+        
+        // Filter by discount_type
+        if ($request->has('discount_type')) {
+            $query->where('discount_type', $request->discount_type);
+        }
+        
+        $discounts = $query->orderBy('min_amount', 'desc')->get();
         return response()->json(['data' => $discounts]);
     });
     // Store Debts Routes

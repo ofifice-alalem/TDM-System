@@ -162,6 +162,95 @@ Authorization: Bearer {token}
 
 ---
 
+### 5️⃣ المنتجات
+```http
+GET /api/products
+Authorization: Bearer {token}
+```
+
+**الفلاتر المتاحة:**
+```http
+# حسب الحالة النشطة
+?is_active=1  # نشط
+?is_active=0  # غير نشط
+```
+
+---
+
+### 6️⃣ المتاجر
+```http
+GET /api/stores
+Authorization: Bearer {token}
+```
+
+**الفلاتر المتاحة:**
+```http
+# حسب الحالة النشطة
+?is_active=1  # نشط
+?is_active=0  # غير نشط
+```
+
+---
+
+### 7️⃣ ديون المتاجر
+```http
+GET /api/stores/debts
+Authorization: Bearer {token}
+```
+
+**الفلاتر المتاحة:**
+```http
+# حسب الحالة النشطة
+?is_active=1  # نشط
+?is_active=0  # غير نشط
+```
+
+---
+
+### 8️⃣ مخزون المسوق الفعلي
+```http
+GET /api/marketer/stock/actual
+Authorization: Bearer {token}
+```
+
+**الفلاتر المتاحة:**
+```http
+# حسب المنتج
+?product_id=5
+```
+
+---
+
+### 9️⃣ مخزون المسوق المحجوز
+```http
+GET /api/marketer/stock/reserved
+Authorization: Bearer {token}
+```
+
+**الفلاتر المتاحة:**
+```http
+# حسب المنتج
+?product_id=5
+```
+
+---
+
+## 🟢 أمين المخزن (Warehouse Keeper)
+
+### 0️⃣ المخزن الرئيسي
+```http
+GET /api/warehouse/main-stock
+Authorization: Bearer {token}
+```
+
+**الفلاتر المتاحة:**
+```http
+# حسب المنتج
+?product_id=5
+```
+
+---
+
 ## 🟢 أمين المخزن (Warehouse Keeper)
 
 ### 1️⃣ طلبات المسوقين
@@ -461,6 +550,21 @@ Authorization: Bearer {token}
 
 ---
 
+### 6️⃣ المسوقين
+```http
+GET /api/admin/marketers
+Authorization: Bearer {token}
+```
+
+**الفلاتر المتاحة:**
+```http
+# حسب الحالة النشطة
+?is_active=1  # نشط
+?is_active=0  # غير نشط
+```
+
+---
+
 ## 📊 ملخص الفلاتر المتاحة
 
 ### حسب النوع:
@@ -473,9 +577,9 @@ Authorization: Bearer {token}
 | `payment_method` | طريقة الدفع | cash, transfer, certified_check | Payments APIs |
 | `from_date` | من تاريخ | YYYY-MM-DD | جميع APIs |
 | `to_date` | إلى تاريخ | YYYY-MM-DD | جميع APIs |
-| `is_active` | الحالة النشطة | 0, 1 | Promotions, Discounts, Users |
-| `product_id` | المنتج | رقم المنتج | Promotions |
-| `discount_type` | نوع الخصم | percentage, fixed | Discounts |
+| `is_active` | الحالة النشطة | 0, 1 | Promotions, Discounts, Users, Products, Stores, Store Debts, Marketers |
+| `product_id` | المنتج | رقم المنتج | Promotions, Stock APIs, Main Stock |
+| `discount_type` | نوع الخصم | percentage, fixed | Discounts, Active Discounts |
 | `role_id` | الدور | 1, 2, 3 | Users |
 
 ---
@@ -610,31 +714,41 @@ GET /api/warehouse/requests
 
 ## ✅ APIs المحدثة - الإحصائيات
 
-### المسوق (6 APIs):
+### المسوق (8 APIs):
 1. ✅ `/api/marketer/requests` - طلبات البضاعة
 2. ✅ `/api/marketer/returns` - إرجاعات البضاعة
 3. ✅ `/api/marketer/sales` - فواتير البيع
 4. ✅ `/api/marketer/payments` - إيصالات القبض
 5. ✅ `/api/marketer/store-returns` - إرجاعات المتاجر
 6. ✅ `/api/marketer/withdrawals` - طلبات السحب
+7. ✅ `/api/marketer/stock/actual` - مخزون المسوق الفعلي
+8. ✅ `/api/marketer/stock/reserved` - مخزون المسوق المحجوز
 
-### أمين المخزن (5 APIs):
+### أمين المخزن (6 APIs):
 1. ✅ `/api/warehouse/requests` - طلبات المسوقين
 2. ✅ `/api/warehouse/returns` - إرجاعات المسوقين
 3. ✅ `/api/warehouse/sales` - فواتير البيع
 4. ✅ `/api/warehouse/payments` - إيصالات القبض
 5. ✅ `/api/warehouse/store-returns` - إرجاعات المتاجر
+6. ✅ `/api/warehouse/main-stock` - المخزن الرئيسي
 
-### الإدارة (5 APIs):
+### الإدارة (6 APIs):
 1. ✅ `/api/admin/sales` - فواتير البيع
 2. ✅ `/api/admin/withdrawals` - طلبات السحب
 3. ✅ `/api/admin/promotions` - العروض الترويجية
 4. ✅ `/api/admin/discounts` - خصومات الفواتير
-5. ✅ `/api/users` - المستخدمين
+5. ✅ `/api/admin/marketers` - المسوقين
+6. ✅ `/api/users` - المستخدمين
+
+### عام (4 APIs):
+1. ✅ `/api/products` - المنتجات
+2. ✅ `/api/stores` - المتاجر
+3. ✅ `/api/stores/debts` - ديون المتاجر
+4. ✅ `/api/discounts/active` - الخصومات النشطة
 
 ---
 
-## 📈 إجمالي APIs المحدثة: 16 API
+## 📈 إجمالي APIs المحدثة: 24 API
 
 ### الفلاتر المضافة:
 - ✅ `status` - الحالة (11 APIs)
@@ -643,9 +757,9 @@ GET /api/warehouse/requests
 - ✅ `from_date` - من تاريخ (14 APIs)
 - ✅ `to_date` - إلى تاريخ (14 APIs)
 - ✅ `payment_method` - طريقة الدفع (2 APIs)
-- ✅ `is_active` - الحالة النشطة (3 APIs)
-- ✅ `product_id` - المنتج (1 API)
-- ✅ `discount_type` - نوع الخصم (1 API)
+- ✅ `is_active` - الحالة النشطة (8 APIs)
+- ✅ `product_id` - المنتج (4 APIs)
+- ✅ `discount_type` - نوع الخصم (2 APIs)
 - ✅ `role_id` - الدور (1 API)
 
 ---

@@ -11,11 +11,18 @@ use Illuminate\Support\Facades\DB;
 
 class AdminMarketerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $marketers = User::whereHas('role', function($q) {
+        $query = User::whereHas('role', function($q) {
             $q->where('name', 'salesman');
-        })->get()->map(function($marketer) {
+        });
+        
+        // Filter by active status
+        if ($request->has('is_active')) {
+            $query->where('is_active', $request->is_active);
+        }
+        
+        $marketers = $query->get()->map(function($marketer) {
             $totalCommissions = MarketerCommission::where('marketer_id', $marketer->id)->sum('commission_amount');
             $totalWithdrawals = MarketerWithdrawalRequest::where('marketer_id', $marketer->id)
                 ->where('status', 'approved')
@@ -25,6 +32,7 @@ class AdminMarketerController extends Controller
                 'id' => $marketer->id,
                 'full_name' => $marketer->full_name,
                 'commission_rate' => $marketer->commission_rate,
+                'is_active' => $marketer->is_active,
                 'total_commissions' => $totalCommissions,
                 'total_withdrawals' => $totalWithdrawals,
                 'available_balance' => $totalCommissions - $totalWithdrawals

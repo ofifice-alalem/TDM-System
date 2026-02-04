@@ -10,18 +10,30 @@ class StockController extends Controller
 {
     public function actual(Request $request)
     {
-        $stock = DB::table('marketer_actual_stock')
-            ->where('marketer_id', $request->user()->id)
-            ->get();
+        $query = DB::table('marketer_actual_stock')
+            ->where('marketer_id', $request->user()->id);
+        
+        // Filter by product_id
+        if ($request->has('product_id')) {
+            $query->where('product_id', $request->product_id);
+        }
+        
+        $stock = $query->get();
 
         return response()->json(['data' => $stock]);
     }
 
     public function reserved(Request $request)
     {
-        $stock = DB::table('marketer_reserved_stock')
-            ->where('marketer_id', $request->user()->id)
-            ->get();
+        $query = DB::table('marketer_reserved_stock')
+            ->where('marketer_id', $request->user()->id);
+        
+        // Filter by product_id
+        if ($request->has('product_id')) {
+            $query->where('product_id', $request->product_id);
+        }
+        
+        $stock = $query->get();
 
         return response()->json(['data' => $stock]);
     }
