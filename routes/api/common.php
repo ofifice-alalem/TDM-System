@@ -6,11 +6,9 @@ use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\StoreDebtController;
 use App\Http\Controllers\Api\UserController;
 
-// Products without auth (for testing)
-Route::get('/products', [ProductController::class, 'index']);
-Route::get('/stores', [StoreController::class, 'index']);
-
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/stores', [StoreController::class, 'index']);
     Route::post('/products', [ProductController::class, 'store']);
     Route::put('/products/{id}', [ProductController::class, 'update']);
     
@@ -43,9 +41,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->get();
         return response()->json(['data' => $discounts]);
     });
+    // Store Debts Routes
+    Route::get('/stores/debts', [StoreDebtController::class, 'index']);
+    Route::get('/stores/debts/{id}', [StoreDebtController::class, 'show']);
+    Route::put('/stores/{id}/toggle-active', [StoreDebtController::class, 'toggleActive'])->middleware('role:admin');
 });
-
-// Store Debts Routes (temporary without auth for testing)
-Route::get('/stores/debts', [StoreDebtController::class, 'index']);
-Route::get('/stores/debts/{id}', [StoreDebtController::class, 'show']);
-Route::put('/stores/{id}/toggle-active', [StoreDebtController::class, 'toggleActive'])->middleware('role:admin');

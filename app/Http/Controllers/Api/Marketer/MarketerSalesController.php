@@ -42,6 +42,15 @@ class MarketerSalesController extends Controller
 
             foreach ($request->items as $item) {
                 $product = DB::table('products')->where('id', $item['product_id'])->first();
+                
+                if (!$product) {
+                    return response()->json(['message' => 'المنتج غير موجود'], 404);
+                }
+
+                if (!$product->is_active) {
+                    return response()->json(['message' => 'المنتج ' . $product->name . ' غير نشط'], 400);
+                }
+
                 $actualStock = DB::table('marketer_actual_stock')
                     ->where('marketer_id', $request->user()->id)
                     ->where('product_id', $item['product_id'])
@@ -160,17 +169,22 @@ class MarketerSalesController extends Controller
 
     public function show(Request $request, $id)
     {
+        $invoice = DB::table('sales_invoices')->where('id', $id)->first();
+        
+        if (!$invoice) {
+            return response()->json(['message' => 'الفاتورة غير موجودة'], 404);
+        }
+
+        if ($invoice->marketer_id != $request->user()->id) {
+            return response()->json(['message' => 'ليس لديك صلاحية الوصول لهذه الفاتورة'], 403);
+        }
+
         $invoice = DB::table('sales_invoices')
             ->join('stores', 'sales_invoices.store_id', '=', 'stores.id')
             ->leftJoin('users as keeper', 'sales_invoices.keeper_id', '=', 'keeper.id')
             ->where('sales_invoices.id', $id)
-            ->where('sales_invoices.marketer_id', $request->user()->id)
             ->select('sales_invoices.*', 'stores.name as store_name', 'keeper.full_name as keeper_name')
             ->first();
-
-        if (!$invoice) {
-            return response()->json(['message' => 'الفاتورة غير موجودة'], 404);
-        }
 
         if ($invoice->stamped_invoice_image) {
             $invoice->stamped_invoice_image = asset('storage/' . $invoice->stamped_invoice_image);
@@ -187,17 +201,22 @@ class MarketerSalesController extends Controller
 
     public function cancel(Request $request, $id)
     {
+        $invoice = DB::table('sales_invoices')->where('id', $id)->first();
+        
+        if (!$invoice) {
+            return response()->json(['message' => 'الفاتورة غير موجودة'], 404);
+        }
+
+        if ($invoice->marketer_id != $request->user()->id) {
+            return response()->json(['message' => 'ليس لديك صلاحية إلغاء هذه الفاتورة'], 403);
+        }
+
+        if ($invoice->status != 'pending') {
+            return response()->json(['message' => 'يمكن إلغاء الفواتير في حالة pending فقط'], 400);
+        }
+
         DB::beginTransaction();
         try {
-            $invoice = DB::table('sales_invoices')
-                ->where('id', $id)
-                ->where('marketer_id', $request->user()->id)
-                ->where('status', 'pending')
-                ->first();
-
-            if (!$invoice) {
-                return response()->json(['message' => 'الفاتورة غير موجودة أو لا يمكن إلغاؤها'], 404);
-            }
 
             $items = DB::table('sales_invoice_items')->where('invoice_id', $id)->get();
 
@@ -227,13 +246,14 @@ class MarketerSalesController extends Controller
     
     public function getRejection(Request $request, $id)
     {
-        $invoice = DB::table('sales_invoices')
-            ->where('id', $id)
-            ->where('marketer_id', $request->user()->id)
-            ->first();
+        $invoice = DB::table('sales_invoices')->where('id', $id)->first();
 
         if (!$invoice) {
             return response()->json(['message' => 'الفاتورة غير موجودة'], 404);
+        }
+
+        if ($invoice->marketer_id != $request->user()->id) {
+            return response()->json(['message' => 'ليس لديك صلاحية الوصول'], 403);
         }
 
         $rejection = DB::table('sales_invoice_rejections')

@@ -84,23 +84,26 @@ class MarketerRequestController extends Controller
      */
     public function show(Request $request, $id)
     {
+        $requestData = DB::table('marketer_requests')->where('id', $id)->first();
+        
+        if (!$requestData) {
+            return response()->json(['message' => 'الطلب غير موجود'], 404);
+        }
+
+        if ($requestData->marketer_id != $request->user()->id) {
+            return response()->json(['message' => 'ليس لديك صلاحية الوصول لهذا الطلب'], 403);
+        }
+
         $requestData = DB::table('marketer_requests')
             ->leftJoin('users as approver', 'marketer_requests.approved_by', '=', 'approver.id')
             ->leftJoin('users as documenter', 'marketer_requests.documented_by', '=', 'documenter.id')
             ->where('marketer_requests.id', $id)
-            ->where('marketer_requests.marketer_id', $request->user()->id)
             ->select(
                 'marketer_requests.*',
                 'approver.full_name as approver_name',
                 'documenter.full_name as documenter_name'
             )
             ->first();
-
-        if (!$requestData) {
-            return response()->json([
-                'message' => 'الطلب غير موجود'
-            ], 404);
-        }
 
         if ($requestData->stamped_image) {
             $requestData->stamped_image = asset('storage/' . $requestData->stamped_image);
@@ -133,16 +136,22 @@ class MarketerRequestController extends Controller
     {
         $request->validate(['notes' => 'nullable|string']);
 
+        $marketerRequest = DB::table('marketer_requests')->where('id', $id)->first();
+        
+        if (!$marketerRequest) {
+            return response()->json(['message' => 'الطلب غير موجود'], 404);
+        }
+
+        if ($marketerRequest->marketer_id != $request->user()->id) {
+            return response()->json(['message' => 'ليس لديك صلاحية إلغاء هذا الطلب'], 403);
+        }
+
+        if (!in_array($marketerRequest->status, ['pending', 'approved'])) {
+            return response()->json(['message' => 'لا يمكن إلغاء طلب موثق أو مرفوض'], 400);
+        }
+
         DB::beginTransaction();
         try {
-            $marketerRequest = DB::table('marketer_requests')
-                ->where('id', $id)
-                ->where('marketer_id', $request->user()->id)
-                ->first();
-
-            if (!$marketerRequest || !in_array($marketerRequest->status, ['pending', 'approved'])) {
-                return response()->json(['message' => 'الطلب غير موجود أو لا يمكن إلغاؤه'], 404);
-            }
 
             if ($marketerRequest->status === 'approved') {
                 $items = DB::table('marketer_request_items')->where('request_id', $id)->get();

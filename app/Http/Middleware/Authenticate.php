@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Closure;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Http\Request;
 
@@ -9,22 +10,14 @@ class Authenticate extends Middleware
 {
     protected function redirectTo(Request $request): ?string
     {
-        if ($request->expectsJson() || $request->is('api/*')) {
-            return null;
-        }
-
-        return route('login');
+        return null;
     }
 
     protected function unauthenticated($request, array $guards)
     {
-        if ($request->expectsJson() || $request->is('api/*')) {
-            abort(response()->json([
-                'message' => 'غير مصرح. يرجى تسجيل الدخول أولاً',
-                'error' => 'Unauthenticated'
-            ], 401));
-        }
-
-        parent::unauthenticated($request, $guards);
+        abort(response()->json([
+            'message' => 'غير مصرح. يرجى تسجيل الدخول أولاً',
+            'error' => 'Unauthenticated'
+        ], 401));
     }
 }

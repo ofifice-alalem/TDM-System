@@ -30,9 +30,19 @@ class MarketerPaymentController extends Controller
             'notes' => 'nullable|string'
         ]);
 
+        // Check if store is active
+        $store = DB::table('stores')->where('id', $request->store_id)->first();
+        if (!$store || !$store->is_active) {
+            return response()->json(['message' => 'المتجر غير نشط أو غير موجود'], 400);
+        }
+
         DB::beginTransaction();
         try {
             $currentDebt = StoreDebtLedger::where('store_id', $request->store_id)->sum('amount');
+
+            if ($currentDebt <= 0) {
+                return response()->json(['message' => 'لا يوجد دين على هذا المتجر'], 400);
+            }
 
             if ($request->amount > $currentDebt) {
                 return response()->json(['message' => 'المبلغ المسدد أكبر من الدين الحالي'], 400);
@@ -62,17 +72,22 @@ class MarketerPaymentController extends Controller
 
     public function show(Request $request, $id)
     {
+        $payment = DB::table('store_payments')->where('id', $id)->first();
+        
+        if (!$payment) {
+            return response()->json(['message' => 'إيصال القبض غير موجود'], 404);
+        }
+
+        if ($payment->marketer_id != $request->user()->id) {
+            return response()->json(['message' => 'ليس لديك صلاحية الوصول لهذا الإيصال'], 403);
+        }
+
         $payment = DB::table('store_payments')
             ->join('stores', 'store_payments.store_id', '=', 'stores.id')
             ->join('users as keeper', 'store_payments.keeper_id', '=', 'keeper.id')
             ->where('store_payments.id', $id)
-            ->where('store_payments.marketer_id', $request->user()->id)
             ->select('store_payments.*', 'stores.name as store_name', 'keeper.full_name as keeper_name')
             ->first();
-
-        if (!$payment) {
-            return response()->json(['message' => 'إيصال القبض غير موجود'], 404);
-        }
 
         if ($payment->receipt_image) {
             $payment->receipt_image = asset('storage/' . $payment->receipt_image);
@@ -89,17 +104,22 @@ class MarketerPaymentController extends Controller
     {
         $request->validate(['notes' => 'nullable|string']);
 
+        $payment = DB::table('store_payments')->where('id', $id)->first();
+        
+        if (!$payment) {
+            return response()->json(['message' => 'إيصال القبض غير موجود'], 404);
+        }
+
+        if ($payment->marketer_id != $request->user()->id) {
+            return response()->json(['message' => 'ليس لديك صلاحية إلغاء هذا الإيصال'], 403);
+        }
+
+        if ($payment->status != 'pending') {
+            return response()->json(['message' => 'يمكن إلغاء الإيصالات في حالة pending فقط'], 400);
+        }
+
         DB::beginTransaction();
         try {
-            $payment = DB::table('store_payments')
-                ->where('id', $id)
-                ->where('marketer_id', $request->user()->id)
-                ->where('status', 'pending')
-                ->first();
-
-            if (!$payment) {
-                return response()->json(['message' => 'إيصال القبض غير موجود أو لا يمكن إلغاؤه'], 404);
-            }
 
             DB::table('store_payments')->where('id', $id)->update([
                 'status' => 'cancelled',

@@ -19,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
+        $middleware->redirectGuestsTo(fn () => abort(response()->json([
+            'message' => 'غير مصرح. يرجى تسجيل الدخول أولاً',
+            'error' => 'Unauthenticated'
+        ], 401)));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
