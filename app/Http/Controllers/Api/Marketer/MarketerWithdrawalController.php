@@ -29,11 +29,11 @@ class MarketerWithdrawalController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $withdrawals = $query->orderBy('created_at', 'desc')->get();
+        $withdrawals = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return response()->json([
             'message' => 'قائمة طلبات السحب',
-            'data' => MarketerWithdrawalResource::collection($withdrawals)
+            'data' => $withdrawals
         ]);
     }
 
