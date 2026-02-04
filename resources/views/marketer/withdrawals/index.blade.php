@@ -201,6 +201,8 @@
     const token = '{{ $token }}';
     let allRequests = [];
     let currentStatus = 'all';
+    let currentPage = 1;
+    let lastPage = 1;
 
     async function fetchBalance() {
         try {
@@ -216,14 +218,28 @@
         }
     }
 
-    async function fetchRequests() {
+    async function fetchRequests(page = 1) {
         try {
-            const response = await fetch('/api/marketer/withdrawals', {
+            let url = `/api/marketer/withdrawals?page=${page}`;
+            if (currentStatus !== 'all') {
+                url += `&status=${currentStatus}`;
+            }
+            
+            const response = await fetch(url, {
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
-            allRequests = result.data || [];
+            
+            if (result.data && result.data.data) {
+                allRequests = result.data.data;
+                currentPage = result.data.current_page;
+                lastPage = result.data.last_page;
+            } else {
+                allRequests = result.data || [];
+            }
+            
             renderRequests();
+            renderPagination();
         } catch (error) {
             showError();
         }
@@ -233,19 +249,19 @@
         currentStatus = status;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderRequests();
+        currentPage = 1;
+        fetchRequests(1);
     }
 
     function renderRequests() {
         const container = document.getElementById('requestsList');
-        let filtered = allRequests.filter(req => currentStatus === 'all' || req.status === currentStatus);
 
-        if (filtered.length === 0) {
+        if (allRequests.length === 0) {
             container.innerHTML = '<div class="empty-state-premium"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg><h3>لا توجد طلبات</h3></div>';
             return;
         }
 
-        container.innerHTML = filtered.map(req => {
+        container.innerHTML = allRequests.map(req => {
             const statusMap = {
                 'pending': { label: 'قيد الانتظار', class: 'status-pending', bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>' },
                 'approved': { label: 'معتمد', class: 'status-approved', bg: 'rgba(16, 185, 129, 0.1)', color: '#10b981', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' },
@@ -272,6 +288,26 @@
                 </div>
             `;
         }).join('');
+    }
+
+    function renderPagination() {
+        if (lastPage <= 1) return;
+        
+        const container = document.getElementById('requestsList');
+        let paginationHTML = '<div style="display: flex; justify-content: center; gap: 8px; margin-top: 24px;">';
+        
+        if (currentPage > 1) {
+            paginationHTML += `<button onclick="fetchRequests(${currentPage - 1})" style="padding: 10px 16px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">السابق</button>`;
+        }
+        
+        paginationHTML += `<span style="padding: 10px 16px; background: var(--card-light); border-radius: 8px; font-weight: 700;">صفحة ${currentPage} من ${lastPage}</span>`;
+        
+        if (currentPage < lastPage) {
+            paginationHTML += `<button onclick="fetchRequests(${currentPage + 1})" style="padding: 10px 16px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">التالي</button>`;
+        }
+        
+        paginationHTML += '</div>';
+        container.innerHTML += paginationHTML;
     }
 
     function showError() {

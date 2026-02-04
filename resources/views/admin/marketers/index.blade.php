@@ -346,7 +346,7 @@
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
-            renderMarketers(result.data || []);
+            renderMarketers(result.data?.data || result.data || []);
         } catch (error) {
             document.getElementById('marketersGrid').innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 100px; color: #ef4444;">⚠️ خطأ في تحميل البيانات</div>';
         }

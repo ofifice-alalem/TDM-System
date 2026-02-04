@@ -71,7 +71,7 @@
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
-            allReturns = result.data || [];
+            allReturns = result.data?.data || result.data || [];
             renderReturns();
         } catch (error) {
             document.getElementById('returnsList').innerHTML = '<div class="empty-state">⚠️ خطأ في تحميل البيانات</div>';

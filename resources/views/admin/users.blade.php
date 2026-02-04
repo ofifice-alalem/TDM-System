@@ -163,8 +163,8 @@
             const usersData = await usersRes.json();
             const rolesData = await rolesRes.json();
             
-            allUsers = usersData.data || [];
-            allRoles = rolesData.data || [];
+            allUsers = usersData.data?.data || usersData.data || [];
+            allRoles = rolesData.data?.data || rolesData.data || [];
             
             displayUsers(allUsers);
             loadRoles();

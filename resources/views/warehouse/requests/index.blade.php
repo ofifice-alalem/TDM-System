@@ -531,8 +531,8 @@
             const reqResult = await reqResponse.json();
             const prodResult = await prodResponse.json();
             
-            allRequests = reqResult.data || [];
-            const products = Array.isArray(prodResult) ? prodResult : (prodResult.data || []);
+            allRequests = reqResult.data?.data || reqResult.data || [];
+            const products = Array.isArray(prodResult) ? prodResult : (prodResult.data?.data || prodResult.data || []);
             
             updateStats(allRequests, products);
             renderProducts(products);

@@ -74,7 +74,7 @@
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
-            allPromotions = result.data || [];
+            allPromotions = result.data?.data || result.data || [];
             renderPromotions();
         } catch (error) {
             document.getElementById('promotionsList').innerHTML = '<div class="empty-state">⚠️ خطأ في تحميل البيانات</div>';

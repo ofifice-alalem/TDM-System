@@ -291,7 +291,7 @@
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
-            allRequests = result.data || [];
+            allRequests = result.data?.data || result.data || [];
             renderRequests();
         } catch (error) {
             console.error('Error:', error);

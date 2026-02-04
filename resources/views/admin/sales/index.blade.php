@@ -84,6 +84,8 @@
         <h3>جاري تحميل الفواتير...</h3>
     </div>
 </div>
+
+@include('shared.pagination')
 @endsection
 
 @push('scripts')
@@ -92,24 +94,32 @@
     let allInvoices = [];
     let currentStatus = 'all';
 
-    async function fetchInvoices() {
+    async function fetchData(page = 1) {
         try {
-            const response = await fetch('/api/admin/sales', {
+            let url = `/api/admin/sales?page=${page}`;
+            if (currentStatus !== 'all') url += `&status=${currentStatus}`;
+            
+            const response = await fetch(url, {
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
-            allInvoices = result.data || [];
+            allInvoices = result.data?.data || result.data || [];
+            updatePagination(result.data);
             renderInvoices();
         } catch (error) {
             console.error('Error:', error);
         }
     }
 
+    async function fetchInvoices() {
+        await fetchData(1);
+    }
+
     function switchTab(status, btn) {
         currentStatus = status;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderInvoices();
+        fetchData(1);
     }
 
     function renderInvoices() {
@@ -119,7 +129,6 @@
         const storeValue = document.getElementById('storeSearch').value.toLowerCase();
         
         let filtered = allInvoices.filter(inv => {
-            if (currentStatus !== 'all' && inv.status !== currentStatus) return false;
             if (searchValue && !inv.invoice_number.toLowerCase().includes(searchValue)) return false;
             if (marketerValue && !inv.marketer_name.toLowerCase().includes(marketerValue)) return false;
             if (storeValue && !inv.store_name.toLowerCase().includes(storeValue)) return false;

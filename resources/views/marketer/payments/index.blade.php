@@ -100,7 +100,7 @@
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
-            allPayments = result.data || [];
+            allPayments = result.data?.data || result.data || [];
             renderPayments();
         } catch (error) {
             console.error('Error:', error);

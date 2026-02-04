@@ -261,7 +261,7 @@
             const productsData = await productsRes.json();
             const stockData = await stockRes.json();
             
-            products = (productsData.data || productsData || []).map(p => {
+            products = (productsData.data?.data || productsData.data || productsData || []).map(p => {
                 const stock = (stockData.data || stockData || []).find(s => s.product_id === p.id);
                 return { ...p, actual_quantity: stock ? stock.quantity : 0 };
             }).filter(p => p.actual_quantity > 0);

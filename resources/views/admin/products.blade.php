@@ -144,7 +144,7 @@
         try {
             const r = await fetch('/api/products', { headers: { 'Authorization': 'Bearer ' + token }});
             const d = await r.json();
-            allProducts = d.data || [];
+            allProducts = d.data?.data || d.data || [];
             displayProducts(allProducts);
         } catch (e) {
             document.getElementById('productsList').innerHTML = '<tr><td colspan="4" class="empty-row">⚠️ فشل التحميل</td></tr>';

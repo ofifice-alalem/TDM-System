@@ -73,7 +73,7 @@
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
-            invoices = result.data || [];
+            invoices = result.data?.data || result.data || [];
             
             const select = document.getElementById('invoiceSelect');
             invoices.forEach(inv => {

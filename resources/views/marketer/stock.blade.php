@@ -455,8 +455,8 @@
             allData = {
                 actual: actual.data || [],
                 reserved: reserved.data || [],
-                products: products.data || products || [],
-                invoices: (invoices.data || []).filter(inv => inv.status === 'pending')
+                products: products.data?.data || products.data || products || [],
+                invoices: ((invoices.data?.data || invoices.data) || []).filter(inv => inv.status === 'pending')
             };
 
             updateStats();

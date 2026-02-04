@@ -408,8 +408,8 @@
             const promotionsData = await promotionsRes.json();
             const discountsData = await discountsRes.json();
             
-            stores = storesData.data || storesData || [];
-            const allProducts = productsData.data || productsData || [];
+            stores = storesData.data?.data || storesData.data || storesData || [];
+            const allProducts = productsData.data?.data || productsData.data || productsData || [];
             const stock = stockData.data || stockData || [];
             const allPromotions = promotionsData.data || [];
             window.discounts = discountsData.data || [];

@@ -62,6 +62,8 @@
         <h3>جاري تحميل الطلبات...</h3>
     </div>
 </div>
+
+@include('shared.pagination')
 @endsection
 
 @push('scripts')
@@ -70,29 +72,37 @@
     let allRequests = [];
     let currentStatus = 'all';
 
-    async function fetchRequests() {
+    async function fetchData(page = 1) {
         try {
-            const response = await fetch('/api/admin/withdrawals', {
+            let url = `/api/admin/withdrawals?page=${page}`;
+            if (currentStatus !== 'all') url += `&status=${currentStatus}`;
+            
+            const response = await fetch(url, {
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
-            allRequests = result.data || [];
+            allRequests = result.data?.data || result.data || [];
+            updatePagination(result.data);
             renderRequests();
         } catch (error) {
             showError();
         }
     }
 
+    async function fetchRequests() {
+        await fetchData(1);
+    }
+
     function switchTab(status, btn) {
         currentStatus = status;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderRequests();
+        fetchData(1);
     }
 
     function renderRequests() {
         const container = document.getElementById('requestsList');
-        let filtered = allRequests.filter(req => currentStatus === 'all' || req.status === currentStatus);
+        let filtered = allRequests;
 
         if (filtered.length === 0) {
             container.innerHTML = '<div class="empty-state-premium"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg><h3>لا توجد طلبات</h3></div>';

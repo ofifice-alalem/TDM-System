@@ -107,12 +107,6 @@
             </span>
             <span class="nav-label">إرجاع من المتاجر</span>
         </a>
-        <a href="/admin/withdrawals" class="nav-link {{ request()->is('admin/withdrawals*') ? 'active' : '' }}">
-            <span class="nav-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-            </span>
-            <span class="nav-label">طلبات السحب</span>
-        </a>
         @endif
 
         @if(auth()->user()->role->name === 'admin')

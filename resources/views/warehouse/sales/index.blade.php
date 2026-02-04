@@ -98,7 +98,7 @@
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
-            allInvoices = result.data || [];
+            allInvoices = result.data?.data || result.data || [];
             renderInvoices();
         } catch (error) {
             console.error('Error:', error);
