@@ -10,15 +10,43 @@ use Illuminate\Support\Facades\DB;
 
 class WarehousePaymentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $payments = DB::table('store_payments')
+        $query = DB::table('store_payments')
             ->join('stores', 'store_payments.store_id', '=', 'stores.id')
             ->join('users as marketer', 'store_payments.marketer_id', '=', 'marketer.id')
             ->join('users as keeper', 'store_payments.keeper_id', '=', 'keeper.id')
-            ->select('store_payments.*', 'stores.name as store_name', 'marketer.full_name as marketer_name', 'keeper.full_name as keeper_name')
-            ->orderBy('store_payments.created_at', 'desc')
-            ->get();
+            ->select('store_payments.*', 'stores.name as store_name', 'marketer.full_name as marketer_name', 'keeper.full_name as keeper_name');
+
+        // Filter by status
+        if ($request->has('status')) {
+            $query->where('store_payments.status', $request->status);
+        }
+
+        // Filter by marketer
+        if ($request->has('marketer_id')) {
+            $query->where('store_payments.marketer_id', $request->marketer_id);
+        }
+
+        // Filter by store
+        if ($request->has('store_id')) {
+            $query->where('store_payments.store_id', $request->store_id);
+        }
+
+        // Filter by payment method
+        if ($request->has('payment_method')) {
+            $query->where('store_payments.payment_method', $request->payment_method);
+        }
+
+        // Filter by date range
+        if ($request->has('from_date')) {
+            $query->whereDate('store_payments.created_at', '>=', $request->from_date);
+        }
+        if ($request->has('to_date')) {
+            $query->whereDate('store_payments.created_at', '<=', $request->to_date);
+        }
+
+        $payments = $query->orderBy('store_payments.created_at', 'desc')->get();
 
         return response()->json(['message' => 'قائمة إيصالات القبض', 'data' => $payments]);
     }

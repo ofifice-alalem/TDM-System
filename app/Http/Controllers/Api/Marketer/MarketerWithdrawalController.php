@@ -13,10 +13,23 @@ class MarketerWithdrawalController extends Controller
 {
     public function index(Request $request)
     {
-        $withdrawals = MarketerWithdrawalRequest::where('marketer_id', $request->user()->id)
-            ->with(['approvedBy:id,full_name', 'rejectedBy:id,full_name'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = MarketerWithdrawalRequest::where('marketer_id', $request->user()->id)
+            ->with(['approvedBy:id,full_name', 'rejectedBy:id,full_name']);
+
+        // Filter by status
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by date range
+        if ($request->has('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->has('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $withdrawals = $query->orderBy('created_at', 'desc')->get();
 
         return response()->json([
             'message' => 'قائمة طلبات السحب',

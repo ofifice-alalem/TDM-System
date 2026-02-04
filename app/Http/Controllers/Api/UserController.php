@@ -9,12 +9,23 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = DB::table('users')
+        $query = DB::table('users')
             ->join('roles', 'users.role_id', '=', 'roles.id')
-            ->select('users.id', 'users.username', 'users.full_name', 'users.is_active', 'roles.display_name as role_name', 'users.commission_rate')
-            ->get();
+            ->select('users.id', 'users.username', 'users.full_name', 'users.is_active', 'roles.display_name as role_name', 'users.commission_rate');
+
+        // Filter by role
+        if ($request->has('role_id')) {
+            $query->where('users.role_id', $request->role_id);
+        }
+
+        // Filter by active status
+        if ($request->has('is_active')) {
+            $query->where('users.is_active', $request->is_active);
+        }
+
+        $users = $query->get();
         
         return response()->json(['data' => $users]);
     }

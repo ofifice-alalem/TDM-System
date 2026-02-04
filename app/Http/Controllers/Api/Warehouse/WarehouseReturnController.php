@@ -11,13 +11,31 @@ class WarehouseReturnController extends Controller
     /**
      * عرض جميع طلبات الإرجاع
      */
-    public function index()
+    public function index(Request $request)
     {
-        $returns = DB::table('marketer_return_requests')
+        $query = DB::table('marketer_return_requests')
             ->join('users', 'marketer_return_requests.marketer_id', '=', 'users.id')
-            ->select('marketer_return_requests.*', 'users.full_name as marketer_name')
-            ->orderBy('marketer_return_requests.created_at', 'desc')
-            ->get();
+            ->select('marketer_return_requests.*', 'users.full_name as marketer_name');
+
+        // Filter by status
+        if ($request->has('status')) {
+            $query->where('marketer_return_requests.status', $request->status);
+        }
+
+        // Filter by marketer
+        if ($request->has('marketer_id')) {
+            $query->where('marketer_return_requests.marketer_id', $request->marketer_id);
+        }
+
+        // Filter by date range
+        if ($request->has('from_date')) {
+            $query->whereDate('marketer_return_requests.created_at', '>=', $request->from_date);
+        }
+        if ($request->has('to_date')) {
+            $query->whereDate('marketer_return_requests.created_at', '<=', $request->to_date);
+        }
+
+        $returns = $query->orderBy('marketer_return_requests.created_at', 'desc')->get();
 
         return response()->json([
             'message' => 'قائمة طلبات الإرجاع',

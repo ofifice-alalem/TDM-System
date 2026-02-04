@@ -9,11 +9,29 @@ use Illuminate\Http\Request;
 
 class ProductPromotionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $promotions = ProductPromotion::with(['product:id,name', 'creator:id,full_name'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = ProductPromotion::with(['product:id,name', 'creator:id,full_name']);
+
+        // Filter by status
+        if ($request->has('is_active')) {
+            $query->where('is_active', $request->is_active);
+        }
+
+        // Filter by product
+        if ($request->has('product_id')) {
+            $query->where('product_id', $request->product_id);
+        }
+
+        // Filter by date range
+        if ($request->has('from_date')) {
+            $query->whereDate('start_date', '>=', $request->from_date);
+        }
+        if ($request->has('to_date')) {
+            $query->whereDate('end_date', '<=', $request->to_date);
+        }
+
+        $promotions = $query->orderBy('created_at', 'desc')->get();
 
         return response()->json([
             'message' => 'قائمة العروض الترويجية',

@@ -9,11 +9,29 @@ use Illuminate\Http\Request;
 
 class InvoiceDiscountController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $discounts = InvoiceDiscountTier::with('creator:id,full_name')
-            ->orderBy('min_amount', 'asc')
-            ->get();
+        $query = InvoiceDiscountTier::with('creator:id,full_name');
+
+        // Filter by status
+        if ($request->has('is_active')) {
+            $query->where('is_active', $request->is_active);
+        }
+
+        // Filter by discount type
+        if ($request->has('discount_type')) {
+            $query->where('discount_type', $request->discount_type);
+        }
+
+        // Filter by date range
+        if ($request->has('from_date')) {
+            $query->whereDate('start_date', '>=', $request->from_date);
+        }
+        if ($request->has('to_date')) {
+            $query->whereDate('end_date', '<=', $request->to_date);
+        }
+
+        $discounts = $query->orderBy('min_amount', 'asc')->get();
 
         return response()->json([
             'message' => 'قائمة قواعد الخصم',

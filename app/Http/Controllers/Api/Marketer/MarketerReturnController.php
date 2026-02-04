@@ -13,10 +13,23 @@ class MarketerReturnController extends Controller
      */
     public function index(Request $request)
     {
-        $returns = DB::table('marketer_return_requests')
-            ->where('marketer_id', $request->user()->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = DB::table('marketer_return_requests')
+            ->where('marketer_id', $request->user()->id);
+
+        // Filter by status
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by date range
+        if ($request->has('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->has('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $returns = $query->orderBy('created_at', 'desc')->get();
 
         return response()->json([
             'message' => 'قائمة طلبات الإرجاع',

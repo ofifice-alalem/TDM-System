@@ -16,10 +16,28 @@ class MarketerStoreReturnController extends Controller
 {
     public function index(Request $request)
     {
-        $returns = SalesReturn::where('marketer_id', $request->user()->id)
-            ->with(['store:id,name', 'salesInvoice:id,invoice_number', 'keeper:id,full_name'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = SalesReturn::where('marketer_id', $request->user()->id)
+            ->with(['store:id,name', 'salesInvoice:id,invoice_number', 'keeper:id,full_name']);
+
+        // Filter by status
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by store
+        if ($request->has('store_id')) {
+            $query->where('store_id', $request->store_id);
+        }
+
+        // Filter by date range
+        if ($request->has('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->has('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $returns = $query->orderBy('created_at', 'desc')->get();
 
         return response()->json([
             'message' => 'قائمة طلبات الإرجاع',
