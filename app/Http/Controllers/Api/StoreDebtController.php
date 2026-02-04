@@ -17,8 +17,10 @@ class StoreDebtController extends Controller
             $query->where('stores.is_active', $request->is_active);
         }
         
-        $stores = $query->get()
-            ->map(function($store) {
+        $query->orderBy('stores.created_at', 'desc');
+        
+        $stores = $query->paginate(20)
+            ->through(function($store) {
                 $totalSales = DB::table('store_debt_ledger')
                     ->where('store_id', $store->id)
                     ->where('entry_type', 'sale')

@@ -20,7 +20,7 @@ class StoreController extends Controller
             $query->where('is_active', true);
         }
         
-        $stores = $query->get();
+        $stores = $query->orderBy('created_at', 'desc')->paginate(20);
         return response()->json($stores);
     }
 

@@ -30,7 +30,7 @@ class MarketerRequestController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $requests = $query->orderBy('created_at', 'desc')->get();
+        $requests = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return response()->json([
             'message' => 'قائمة طلبات المسوق',

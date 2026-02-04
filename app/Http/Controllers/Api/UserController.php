@@ -25,7 +25,7 @@ class UserController extends Controller
             $query->where('users.is_active', $request->is_active);
         }
 
-        $users = $query->get();
+        $users = $query->orderBy('users.created_at', 'desc')->paginate(20);
         
         return response()->json(['data' => $users]);
     }

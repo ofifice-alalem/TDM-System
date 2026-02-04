@@ -22,7 +22,7 @@ class ProductController extends Controller
             $query->where('products.is_active', true);
         }
         
-        $products = $query->get();
+        $products = $query->orderBy('products.created_at', 'desc')->paginate(20);
         
         return response()->json(['data' => $products]);
     }
