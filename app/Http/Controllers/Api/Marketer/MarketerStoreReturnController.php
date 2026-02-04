@@ -37,11 +37,24 @@ class MarketerStoreReturnController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $returns = $query->orderBy('created_at', 'desc')->get();
+        $returns = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return response()->json([
             'message' => 'قائمة طلبات الإرجاع',
-            'data' => SalesReturnResource::collection($returns)
+            'data' => [
+                'current_page' => $returns->currentPage(),
+                'data' => SalesReturnResource::collection($returns->items()),
+                'first_page_url' => $returns->url(1),
+                'from' => $returns->firstItem(),
+                'last_page' => $returns->lastPage(),
+                'last_page_url' => $returns->url($returns->lastPage()),
+                'next_page_url' => $returns->nextPageUrl(),
+                'path' => $returns->path(),
+                'per_page' => $returns->perPage(),
+                'prev_page_url' => $returns->previousPageUrl(),
+                'to' => $returns->lastItem(),
+                'total' => $returns->total()
+            ]
         ]);
     }
 

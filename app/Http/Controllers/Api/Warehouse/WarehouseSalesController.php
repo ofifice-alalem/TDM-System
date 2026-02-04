@@ -38,7 +38,7 @@ class WarehouseSalesController extends Controller
             $invoices->whereDate('sales_invoices.created_at', '<=', $request->to_date);
         }
 
-        $invoices = $invoices->orderBy('sales_invoices.created_at', 'desc')->get();
+        $invoices = $invoices->orderBy('sales_invoices.created_at', 'desc')->paginate(20);
 
         return response()->json(['message' => 'قائمة فواتير البيع', 'data' => $invoices]);
     }

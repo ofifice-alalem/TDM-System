@@ -22,7 +22,9 @@ class AdminMarketerController extends Controller
             $query->where('is_active', $request->is_active);
         }
         
-        $marketers = $query->get()->map(function($marketer) {
+        $marketers = $query->paginate(20);
+        
+        $data = $marketers->through(function($marketer) {
             $totalCommissions = MarketerCommission::where('marketer_id', $marketer->id)->sum('commission_amount');
             $totalWithdrawals = MarketerWithdrawalRequest::where('marketer_id', $marketer->id)
                 ->where('status', 'approved')
@@ -39,7 +41,7 @@ class AdminMarketerController extends Controller
             ];
         });
 
-        return response()->json(['message' => 'قائمة المسوقين', 'data' => $marketers]);
+        return response()->json(['message' => 'قائمة المسوقين', 'data' => $data]);
     }
 
     public function updateCommissionRate(Request $request, $id)

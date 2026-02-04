@@ -19,9 +19,9 @@ class MarketerSalesController extends Controller
             $query->where('sales_invoices.status', $request->status);
         }
 
-        $invoices = $query->orderBy('sales_invoices.created_at', 'desc')->get();
+        $invoices = $query->orderBy('sales_invoices.created_at', 'desc')->paginate(20);
 
-        return response()->json(['message', 'data' => $invoices]);
+        return response()->json(['message' => 'قائمة الفواتير', 'data' => $invoices]);
     }
 
     public function store(Request $request)

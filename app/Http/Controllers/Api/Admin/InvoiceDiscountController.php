@@ -31,11 +31,24 @@ class InvoiceDiscountController extends Controller
             $query->whereDate('end_date', '<=', $request->to_date);
         }
 
-        $discounts = $query->orderBy('min_amount', 'asc')->get();
+        $discounts = $query->orderBy('min_amount', 'asc')->paginate(20);
 
         return response()->json([
             'message' => 'قائمة قواعد الخصم',
-            'data' => InvoiceDiscountResource::collection($discounts)
+            'data' => [
+                'current_page' => $discounts->currentPage(),
+                'data' => InvoiceDiscountResource::collection($discounts->items()),
+                'first_page_url' => $discounts->url(1),
+                'from' => $discounts->firstItem(),
+                'last_page' => $discounts->lastPage(),
+                'last_page_url' => $discounts->url($discounts->lastPage()),
+                'next_page_url' => $discounts->nextPageUrl(),
+                'path' => $discounts->path(),
+                'per_page' => $discounts->perPage(),
+                'prev_page_url' => $discounts->previousPageUrl(),
+                'to' => $discounts->lastItem(),
+                'total' => $discounts->total()
+            ]
         ]);
     }
 

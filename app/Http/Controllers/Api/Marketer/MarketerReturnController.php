@@ -29,7 +29,7 @@ class MarketerReturnController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $returns = $query->orderBy('created_at', 'desc')->get();
+        $returns = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return response()->json([
             'message' => 'قائمة طلبات الإرجاع',

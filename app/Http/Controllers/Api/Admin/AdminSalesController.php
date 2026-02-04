@@ -38,7 +38,7 @@ class AdminSalesController extends Controller
             $query->whereDate('sales_invoices.created_at', '<=', $request->to_date);
         }
 
-        $invoices = $query->orderBy('sales_invoices.created_at', 'desc')->get();
+        $invoices = $query->orderBy('sales_invoices.created_at', 'desc')->paginate(20);
 
         return response()->json(['message' => 'قائمة فواتير البيع', 'data' => $invoices]);
     }

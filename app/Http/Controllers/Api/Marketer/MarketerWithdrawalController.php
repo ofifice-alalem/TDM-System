@@ -33,7 +33,20 @@ class MarketerWithdrawalController extends Controller
 
         return response()->json([
             'message' => 'قائمة طلبات السحب',
-            'data' => $withdrawals
+            'data' => [
+                'current_page' => $withdrawals->currentPage(),
+                'data' => MarketerWithdrawalResource::collection($withdrawals->items()),
+                'first_page_url' => $withdrawals->url(1),
+                'from' => $withdrawals->firstItem(),
+                'last_page' => $withdrawals->lastPage(),
+                'last_page_url' => $withdrawals->url($withdrawals->lastPage()),
+                'next_page_url' => $withdrawals->nextPageUrl(),
+                'path' => $withdrawals->path(),
+                'per_page' => $withdrawals->perPage(),
+                'prev_page_url' => $withdrawals->previousPageUrl(),
+                'to' => $withdrawals->lastItem(),
+                'total' => $withdrawals->total()
+            ]
         ]);
     }
 

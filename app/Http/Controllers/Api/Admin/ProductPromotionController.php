@@ -31,11 +31,24 @@ class ProductPromotionController extends Controller
             $query->whereDate('end_date', '<=', $request->to_date);
         }
 
-        $promotions = $query->orderBy('created_at', 'desc')->get();
+        $promotions = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return response()->json([
             'message' => 'قائمة العروض الترويجية',
-            'data' => ProductPromotionResource::collection($promotions)
+            'data' => [
+                'current_page' => $promotions->currentPage(),
+                'data' => ProductPromotionResource::collection($promotions->items()),
+                'first_page_url' => $promotions->url(1),
+                'from' => $promotions->firstItem(),
+                'last_page' => $promotions->lastPage(),
+                'last_page_url' => $promotions->url($promotions->lastPage()),
+                'next_page_url' => $promotions->nextPageUrl(),
+                'path' => $promotions->path(),
+                'per_page' => $promotions->perPage(),
+                'prev_page_url' => $promotions->previousPageUrl(),
+                'to' => $promotions->lastItem(),
+                'total' => $promotions->total()
+            ]
         ]);
     }
 

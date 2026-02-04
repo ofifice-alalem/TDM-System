@@ -46,7 +46,7 @@ class WarehousePaymentController extends Controller
             $query->whereDate('store_payments.created_at', '<=', $request->to_date);
         }
 
-        $payments = $query->orderBy('store_payments.created_at', 'desc')->get();
+        $payments = $query->orderBy('store_payments.created_at', 'desc')->paginate(20);
 
         return response()->json(['message' => 'قائمة إيصالات القبض', 'data' => $payments]);
     }
