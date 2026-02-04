@@ -304,6 +304,8 @@
         <h3>جاري تحميل الطلبات...</h3>
     </div>
 </div>
+
+@include('shared.pagination')
 @endsection
 
 @push('scripts')
@@ -312,13 +314,17 @@
     let allRequests = [];
     let currentStatus = 'all';
 
-    async function fetchRequests() {
+    async function fetchData(page = 1) {
         try {
-            const response = await fetch('/api/marketer/returns', {
+            let url = `/api/marketer/returns?page=${page}`;
+            if (currentStatus !== 'all') url += `&status=${currentStatus}`;
+            
+            const response = await fetch(url, {
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
             allRequests = result.data?.data || result.data || [];
+            updatePagination(result.data);
             renderRequests();
         } catch (error) {
             console.error('Error:', error);
@@ -326,11 +332,15 @@
         }
     }
 
+    async function fetchRequests() {
+        await fetchData(1);
+    }
+
     function switchTab(status, btn) {
         currentStatus = status;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderRequests();
+        fetchData(1);
     }
 
     function renderRequests() {
@@ -338,7 +348,6 @@
         const searchValue = document.getElementById('searchInput').value.toLowerCase();
         
         let filtered = allRequests.filter(req => {
-            if (currentStatus !== 'all' && req.status !== currentStatus) return false;
             if (searchValue && !req.invoice_number.toLowerCase().includes(searchValue)) return false;
             return true;
         });

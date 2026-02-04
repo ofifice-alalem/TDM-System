@@ -88,6 +88,8 @@
         <h3>جاري تحميل الفواتير...</h3>
     </div>
 </div>
+
+@include('shared.pagination')
 @endsection
 
 @push('scripts')
@@ -96,13 +98,17 @@
     let allInvoices = [];
     let currentStatus = 'all';
 
-    async function fetchInvoices() {
+    async function fetchData(page = 1) {
         try {
-            const response = await fetch('/api/marketer/sales', {
+            let url = `/api/marketer/sales?page=${page}`;
+            if (currentStatus !== 'all') url += `&status=${currentStatus}`;
+            
+            const response = await fetch(url, {
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
             allInvoices = result.data?.data || result.data || [];
+            updatePagination(result.data);
             renderInvoices();
         } catch (error) {
             console.error('Error:', error);
@@ -110,11 +116,15 @@
         }
     }
 
+    async function fetchInvoices() {
+        await fetchData(1);
+    }
+
     function switchTab(status, btn) {
         currentStatus = status;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderInvoices();
+        fetchData(1);
     }
 
     function renderInvoices() {
@@ -123,7 +133,6 @@
         const storeValue = document.getElementById('storeSearch').value.toLowerCase();
         
         let filtered = allInvoices.filter(inv => {
-            if (currentStatus !== 'all' && inv.status !== currentStatus) return false;
             if (searchValue && !inv.invoice_number.toLowerCase().includes(searchValue)) return false;
             if (storeValue && !inv.store_name.toLowerCase().includes(storeValue)) return false;
             return true;
@@ -149,7 +158,7 @@
                     <div class="invoice-info">
                         <div class="invoice-num">#${inv.invoice_number}</div>
                         <div><span class="info-label">المتجر</span><div class="info-value">${inv.store_name}</div></div>
-                        <div><span class="info-label">المبلغ</span><div class="info-value">${parseFloat(inv.total_amount).toFixed(2)} د</div></div>
+                        <div><span class="info-label">المبلغ</span><div class="info-value">${parseFloat(inv.total_amount).toFixed(2)} دينار</div></div>
                         <div class="status-badge ${status.class}">${status.icon.replace('width="24" height="24"', 'width="18" height="18"')} ${status.label}</div>
                     </div>
                     <a href="/marketer/sales/${inv.id}" class="btn-action">تفاصيل<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></a>

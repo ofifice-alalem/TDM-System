@@ -79,7 +79,7 @@
             invoices.forEach(inv => {
                 const option = document.createElement('option');
                 option.value = inv.id;
-                option.textContent = `${inv.invoice_number} - ${inv.store_name} - ${parseFloat(inv.total_amount).toFixed(2)} ريال`;
+                option.textContent = `${inv.invoice_number} - ${inv.store_name} - ${parseFloat(inv.total_amount).toFixed(2)} دينار`;
                 select.appendChild(option);
             });
         } catch (error) {

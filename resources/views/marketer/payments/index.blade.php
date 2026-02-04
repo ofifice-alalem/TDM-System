@@ -86,6 +86,8 @@
         <h3>جاري تحميل الإيصالات...</h3>
     </div>
 </div>
+
+@include('shared.pagination')
 @endsection
 
 @push('scripts')
@@ -94,13 +96,17 @@
     let allPayments = [];
     let currentStatus = 'all';
 
-    async function fetchPayments() {
+    async function fetchData(page = 1) {
         try {
-            const response = await fetch('/api/marketer/payments', {
+            let url = `/api/marketer/payments?page=${page}`;
+            if (currentStatus !== 'all') url += `&status=${currentStatus}`;
+            
+            const response = await fetch(url, {
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
             allPayments = result.data?.data || result.data || [];
+            updatePagination(result.data);
             renderPayments();
         } catch (error) {
             console.error('Error:', error);
@@ -108,11 +114,15 @@
         }
     }
 
+    async function fetchPayments() {
+        await fetchData(1);
+    }
+
     function switchTab(status, btn) {
         currentStatus = status;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderPayments();
+        fetchData(1);
     }
 
     function renderPayments() {
@@ -121,7 +131,6 @@
         const searchStore = document.getElementById('searchStore').value.toLowerCase();
         
         let filtered = allPayments.filter(pay => {
-            if (currentStatus !== 'all' && pay.status !== currentStatus) return false;
             if (searchPayment && !pay.payment_number.toLowerCase().includes(searchPayment)) return false;
             if (searchStore && !pay.store_name.toLowerCase().includes(searchStore)) return false;
             return true;

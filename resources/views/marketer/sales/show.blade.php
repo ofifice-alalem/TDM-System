@@ -242,13 +242,13 @@
         document.getElementById('invoiceNumber').textContent = `#${invoice.invoice_number}`;
         document.getElementById('storeName').textContent = invoice.store_name || '---';
         document.getElementById('createdAt').textContent = new Date(invoice.created_at).toLocaleDateString('en-US').replace(/\//g, '-');
-        document.getElementById('totalAmount').textContent = parseFloat(invoice.total_amount).toFixed(2) + ' د';
+        document.getElementById('totalAmount').textContent = parseFloat(invoice.total_amount).toFixed(2) + ' دينار';
         
         // Update sidebar details
-        document.getElementById('subtotalSidebar').textContent = parseFloat(invoice.subtotal || 0).toFixed(2) + ' د';
-        document.getElementById('productDiscountSidebar').textContent = parseFloat(invoice.product_discount || 0).toFixed(2) + ' د';
-        document.getElementById('invoiceDiscountSidebar').textContent = parseFloat(invoice.invoice_discount_amount || 0).toFixed(2) + ' د';
-        document.getElementById('totalSidebar').textContent = parseFloat(invoice.total_amount).toFixed(2) + ' د';
+        document.getElementById('subtotalSidebar').textContent = parseFloat(invoice.subtotal || 0).toFixed(2) + ' دينار';
+        document.getElementById('productDiscountSidebar').textContent = parseFloat(invoice.product_discount || 0).toFixed(2) + ' دينار';
+        document.getElementById('invoiceDiscountSidebar').textContent = parseFloat(invoice.invoice_discount_amount || 0).toFixed(2) + ' دينار';
+        document.getElementById('totalSidebar').textContent = parseFloat(invoice.total_amount).toFixed(2) + ' دينار';
 
         if (invoice.status === 'approved' && invoice.keeper_name) {
             document.getElementById('approvalSection').style.display = 'block';
@@ -269,8 +269,8 @@
                     <td>${item.product_name}</td>
                     <td style="text-align: center;"><span style="background: rgba(139, 92, 246, 0.1); color: var(--primary); padding: 6px 14px; border-radius: 99px; font-weight: 800;">${totalQty}</span></td>
                     <td style="text-align: center;">${item.free_quantity > 0 ? `<span style="background: rgba(34, 197, 94, 0.1); color: #22c55e; padding: 6px 14px; border-radius: 99px; font-weight: 800;">${item.free_quantity}</span>` : '-'}</td>
-                    <td style="text-align: center;">${parseFloat(item.unit_price).toFixed(2)} د</td>
-                    <td style="text-align: center; font-weight: 800;">${parseFloat(item.total_price).toFixed(2)} د</td>
+                    <td style="text-align: center;">${parseFloat(item.unit_price).toFixed(2)} دينار</td>
+                    <td style="text-align: center; font-weight: 800;">${parseFloat(item.total_price).toFixed(2)} دينار</td>
                 </tr>
             `}).join('');
         }

@@ -158,7 +158,7 @@
                         <div class="invoice-num">#${inv.invoice_number}</div>
                         <div><span class="info-label">المسوق</span><div class="info-value">${inv.marketer_name}</div></div>
                         <div><span class="info-label">المتجر</span><div class="info-value">${inv.store_name}</div></div>
-                        <div><span class="info-label">المبلغ</span><div class="info-value">${parseFloat(inv.total_amount).toFixed(2)} د</div></div>
+                        <div><span class="info-label">المبلغ</span><div class="info-value">${parseFloat(inv.total_amount).toFixed(2)} دينار</div></div>
                         <div class="status-badge ${status.class}">${status.icon.replace('width="24" height="24"', 'width="18" height="18"')} ${status.label}</div>
                     </div>
                     <a href="/admin/sales/${inv.id}" class="btn-action">تفاصيل<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></a>

@@ -84,6 +84,8 @@
         <h3>جاري تحميل الفواتير...</h3>
     </div>
 </div>
+
+@include('shared.pagination')
 @endsection
 
 @push('scripts')
@@ -92,14 +94,15 @@
     let allInvoices = [];
     let currentStatus = 'all';
 
-    async function fetchInvoices() {
+    async function fetchInvoices(page = 1) {
         try {
-            const response = await fetch('/api/warehouse/sales', {
+            const response = await fetch(`/api/warehouse/sales?page=${page}`, {
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
             allInvoices = result.data?.data || result.data || [];
             renderInvoices();
+            updatePagination(result.data);
         } catch (error) {
             console.error('Error:', error);
         }
@@ -109,7 +112,7 @@
         currentStatus = status;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderInvoices();
+        fetchInvoices(1);
     }
 
     function renderInvoices() {
@@ -149,7 +152,7 @@
                         <div class="invoice-num">#${inv.invoice_number}</div>
                         <div><span class="info-label">المسوق</span><div class="info-value">${inv.marketer_name}</div></div>
                         <div><span class="info-label">المتجر</span><div class="info-value">${inv.store_name}</div></div>
-                        <div><span class="info-label">المبلغ</span><div class="info-value">${parseFloat(inv.total_amount).toFixed(2)} د</div></div>
+                        <div><span class="info-label">المبلغ</span><div class="info-value">${parseFloat(inv.total_amount).toFixed(2)} دينار</div></div>
                         <div class="status-badge ${status.class}">${status.icon.replace('width="24" height="24"', 'width="18" height="18"')} ${status.label}</div>
                     </div>
                     <a href="/warehouse/sales/${inv.id}" class="btn-action">تفاصيل<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></a>

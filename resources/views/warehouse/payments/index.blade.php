@@ -82,6 +82,8 @@
         <h3>جاري تحميل الإيصالات...</h3>
     </div>
 </div>
+
+@include('shared.pagination')
 @endsection
 
 @push('scripts')
@@ -90,14 +92,15 @@
     let allPayments = [];
     let currentStatus = 'all';
 
-    async function fetchPayments() {
+    async function fetchPayments(page = 1) {
         try {
-            const response = await fetch('/api/warehouse/payments', {
+            const response = await fetch(`/api/warehouse/payments?page=${page}`, {
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
             allPayments = result.data?.data || result.data || [];
             renderPayments();
+            updatePagination(result.data);
         } catch (error) {
             console.error('Error:', error);
             showError();
@@ -108,7 +111,7 @@
         currentStatus = status;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderPayments();
+        fetchPayments(1);
     }
 
     function renderPayments() {

@@ -56,7 +56,7 @@
                     <input type="text" id="productName" required>
                 </div>
                 <div class="field">
-                    <label>سعر البيع (LYD)</label>
+                    <label>سعر البيع (دينار)</label>
                     <input type="number" id="productPrice" step="0.01" min="0" required>
                 </div>
                 <div class="field">
@@ -157,7 +157,7 @@
             <tr>
                 <td><small>#${p.id}</small></td>
                 <td>${p.name}</td>
-                <td class="price-cell">${parseFloat(p.current_price || 0).toFixed(2)} LYD</td>
+                <td class="price-cell">${parseFloat(p.current_price || 0).toFixed(2)} دينار</td>
                 <td><span class="action-link" onclick="editProduct(${p.id}, '${p.name}', ${p.current_price || 0})">تحرير</span></td>
             </tr>
         `).join('') || '<tr><td colspan="4" class="empty-row">لا يوجد بيانات</td></tr>';

@@ -194,6 +194,8 @@
         <h3>جاري تحميل الطلبات...</h3>
     </div>
 </div>
+
+@include('shared.pagination')
 @endsection
 
 @push('scripts')
@@ -201,8 +203,6 @@
     const token = '{{ $token }}';
     let allRequests = [];
     let currentStatus = 'all';
-    let currentPage = 1;
-    let lastPage = 1;
 
     async function fetchBalance() {
         try {
@@ -218,39 +218,32 @@
         }
     }
 
-    async function fetchRequests(page = 1) {
+    async function fetchData(page = 1) {
         try {
             let url = `/api/marketer/withdrawals?page=${page}`;
-            if (currentStatus !== 'all') {
-                url += `&status=${currentStatus}`;
-            }
+            if (currentStatus !== 'all') url += `&status=${currentStatus}`;
             
             const response = await fetch(url, {
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
-            
-            if (result.data && result.data.data) {
-                allRequests = result.data.data;
-                currentPage = result.data.current_page;
-                lastPage = result.data.last_page;
-            } else {
-                allRequests = result.data || [];
-            }
-            
+            allRequests = result.data?.data || result.data || [];
+            updatePagination(result.data);
             renderRequests();
-            renderPagination();
         } catch (error) {
             showError();
         }
+    }
+
+    async function fetchRequests(page = 1) {
+        await fetchData(page);
     }
 
     function switchTab(status, btn) {
         currentStatus = status;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        currentPage = 1;
-        fetchRequests(1);
+        fetchData(1);
     }
 
     function renderRequests() {
@@ -277,7 +270,7 @@
                 <div class="request-card-premium">
                     <div class="request-icon-box" style="background: ${status.bg}; color: ${status.color};">${status.icon}</div>
                     <div class="request-info-group">
-                        <div class="amount-display">${parseFloat(req.requested_amount).toFixed(2)} ريال</div>
+                        <div class="amount-display">${parseFloat(req.requested_amount).toFixed(2)} دينار</div>
                         <div class="date-info">
                             <span class="date-label">التوقيت</span>
                             <span class="date-value">${dateStr} | ${timeStr}</span>
@@ -288,26 +281,6 @@
                 </div>
             `;
         }).join('');
-    }
-
-    function renderPagination() {
-        if (lastPage <= 1) return;
-        
-        const container = document.getElementById('requestsList');
-        let paginationHTML = '<div style="display: flex; justify-content: center; gap: 8px; margin-top: 24px;">';
-        
-        if (currentPage > 1) {
-            paginationHTML += `<button onclick="fetchRequests(${currentPage - 1})" style="padding: 10px 16px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">السابق</button>`;
-        }
-        
-        paginationHTML += `<span style="padding: 10px 16px; background: var(--card-light); border-radius: 8px; font-weight: 700;">صفحة ${currentPage} من ${lastPage}</span>`;
-        
-        if (currentPage < lastPage) {
-            paginationHTML += `<button onclick="fetchRequests(${currentPage + 1})" style="padding: 10px 16px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">التالي</button>`;
-        }
-        
-        paginationHTML += '</div>';
-        container.innerHTML += paginationHTML;
     }
 
     function showError() {

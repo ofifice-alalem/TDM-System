@@ -513,6 +513,8 @@
         <h3>جاري تحميل الطلبات...</h3>
     </div>
 </div>
+
+@include('shared.pagination')
 @endsection
 
 @push('scripts')
@@ -521,10 +523,13 @@
     let allRequests = [];
     let currentStatus = 'all';
 
-    async function fetchData() {
+    async function fetchData(page = 1) {
         try {
+            let url = `/api/warehouse/requests?page=${page}`;
+            if (currentStatus !== 'all') url += `&status=${currentStatus}`;
+            
             const [reqResponse, prodResponse] = await Promise.all([
-                fetch('/api/warehouse/requests', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } }),
+                fetch(url, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } }),
                 fetch('/api/products', { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } })
             ]);
             
@@ -534,6 +539,7 @@
             allRequests = reqResult.data?.data || reqResult.data || [];
             const products = Array.isArray(prodResult) ? prodResult : (prodResult.data?.data || prodResult.data || []);
             
+            updatePagination(reqResult.data);
             updateStats(allRequests, products);
             renderProducts(products);
             renderRequests();
@@ -595,7 +601,7 @@
         currentStatus = status;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderRequests();
+        fetchData(1);
     }
 
     function renderRequests() {

@@ -126,7 +126,7 @@
                     <div class="request-icon-box" style="background: ${status.bg}; color: ${status.color};">${status.icon}</div>
                     <div class="request-info-group">
                         <div class="marketer-name">${req.marketer_name || 'غير محدد'}</div>
-                        <div class="amount-display">${parseFloat(req.requested_amount).toFixed(2)} ريال</div>
+                        <div class="amount-display">${parseFloat(req.requested_amount).toFixed(2)} دينار</div>
                         <div class="date-info">
                             <span class="date-label">التوقيت</span>
                             <span class="date-value">${dateStr} | ${timeStr}</span>

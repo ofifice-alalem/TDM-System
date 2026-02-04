@@ -82,6 +82,8 @@
         <h3 style="font-size: 20px; font-weight: 700;">جاري تحميل المتاجر...</h3>
     </div>
 </div>
+
+@include('shared.pagination')
 @endsection
 
 @push('scripts')
@@ -89,13 +91,14 @@
     const token = '{{ $token }}';
     const isAdmin = {{ auth()->user()->role->name === 'admin' ? 'true' : 'false' }};
 
-    async function fetchStores() {
+    async function fetchStores(page = 1) {
         try {
-            const response = await fetch('/api/stores/debts', {
+            const response = await fetch(`/api/stores/debts?page=${page}`, {
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
             renderStores(result.data?.data || []);
+            updatePagination(result.data);
         } catch (error) {
             document.getElementById('storesGrid').innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 100px; color: #ef4444;">⚠️ خطأ في تحميل البيانات</div>';
         }

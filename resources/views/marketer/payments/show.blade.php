@@ -140,7 +140,7 @@
         <div class="info-card">
             <div class="amount-display" style="margin-top: 0; margin-bottom: 32px;">
                 <div class="amount-label">المبلغ المسدد</div>
-                <div class="amount-value" id="amountValue">0 ر.س</div>
+                <div class="amount-value" id="amountValue">0 دينار</div>
             </div>
             <div class="info-grid">
                 <div class="info-item">

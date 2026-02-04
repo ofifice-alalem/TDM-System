@@ -177,7 +177,7 @@
         document.getElementById('invoiceNumber').textContent = data.sales_invoice_number || '-';
         document.getElementById('marketerName').textContent = data.marketer_name || '-';
         document.getElementById('storeName').textContent = data.store_name || '-';
-        document.getElementById('totalAmount').textContent = parseFloat(data.total_amount).toFixed(2) + ' ريال';
+        document.getElementById('totalAmount').textContent = parseFloat(data.total_amount).toFixed(2) + ' دينار';
         document.getElementById('createdAt').textContent = new Date(data.created_at).toLocaleDateString('en-US').replace(/\//g, '-');
         document.getElementById('statusBadge').textContent = status.label;
         document.getElementById('statusBadge').className = `status-badge ${status.class}`;
@@ -200,8 +200,8 @@
                 <tr>
                     <td>${item.product_name}</td>
                     <td>${item.quantity}</td>
-                    <td>${parseFloat(item.unit_price).toFixed(2)} ريال</td>
-                    <td>${parseFloat(item.subtotal).toFixed(2)} ريال</td>
+                    <td>${parseFloat(item.unit_price).toFixed(2)} دينار</td>
+                    <td>${parseFloat(item.subtotal).toFixed(2)} دينار</td>
                 </tr>
             `).join('');
         }

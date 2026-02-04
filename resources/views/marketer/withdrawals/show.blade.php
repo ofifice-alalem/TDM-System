@@ -179,7 +179,7 @@
         
         document.getElementById('statusBadge').textContent = status.label;
         document.getElementById('statusBadge').className = `status-badge ${status.class}`;
-        document.getElementById('requestedAmount').textContent = parseFloat(withdrawal.requested_amount).toFixed(2) + ' ريال';
+        document.getElementById('requestedAmount').textContent = parseFloat(withdrawal.requested_amount).toFixed(2) + ' دينار';
         document.getElementById('createdAt').textContent = `${formattedDate} | ${formattedTime}`;
 
         if (withdrawal.status === 'approved') {

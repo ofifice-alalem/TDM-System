@@ -168,12 +168,12 @@
         document.getElementById('statusBadge').textContent = status.label;
         document.getElementById('statusBadge').className = `status-badge ${status.class}`;
         document.getElementById('marketerName').textContent = withdrawal.marketer_name || 'غير محدد';
-        document.getElementById('requestedAmount').textContent = parseFloat(withdrawal.requested_amount).toFixed(2) + ' ريال';
+        document.getElementById('requestedAmount').textContent = parseFloat(withdrawal.requested_amount).toFixed(2) + ' دينار';
         document.getElementById('createdAt').textContent = `${formattedDate} | ${formattedTime}`;
 
         if (withdrawal.status === 'pending') {
             document.getElementById('balanceCard').style.display = 'block';
-            document.getElementById('availableBalance').textContent = parseFloat(availableBalance).toFixed(2) + ' ريال';
+            document.getElementById('availableBalance').textContent = parseFloat(availableBalance).toFixed(2) + ' دينار';
         }
 
         if (withdrawal.status === 'rejected') {

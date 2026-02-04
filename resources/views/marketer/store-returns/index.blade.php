@@ -57,6 +57,8 @@
 <div class="returns-list" id="returnsList">
     <div class="empty-state">جاري تحميل الطلبات...</div>
 </div>
+
+@include('shared.pagination')
 @endsection
 
 @push('scripts')
@@ -65,29 +67,37 @@
     let allReturns = [];
     let currentStatus = 'all';
 
-    async function fetchReturns() {
+    async function fetchData(page = 1) {
         try {
-            const response = await fetch('/api/marketer/store-returns', {
+            let url = `/api/marketer/store-returns?page=${page}`;
+            if (currentStatus !== 'all') url += `&status=${currentStatus}`;
+            
+            const response = await fetch(url, {
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
             allReturns = result.data?.data || result.data || [];
+            updatePagination(result.data);
             renderReturns();
         } catch (error) {
             document.getElementById('returnsList').innerHTML = '<div class="empty-state">⚠️ خطأ في تحميل البيانات</div>';
         }
     }
 
+    async function fetchReturns() {
+        await fetchData(1);
+    }
+
     function switchTab(status, btn) {
         currentStatus = status;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderReturns();
+        fetchData(1);
     }
 
     function renderReturns() {
         const container = document.getElementById('returnsList');
-        let filtered = allReturns.filter(ret => currentStatus === 'all' || ret.status === currentStatus);
+        let filtered = allReturns;
 
         if (filtered.length === 0) {
             container.innerHTML = '<div class="empty-state">لا توجد طلبات</div>';
@@ -120,7 +130,7 @@
                         </div>
                         <div>
                             <div class="info-label">المبلغ</div>
-                            <div class="amount-display">${parseFloat(ret.total_amount).toFixed(2)} ريال</div>
+                            <div class="amount-display">${parseFloat(ret.total_amount).toFixed(2)} دينار</div>
                         </div>
                         <div>
                             <div class="info-label">الحالة</div>

@@ -51,6 +51,8 @@
 <div class="returns-list" id="returnsList">
     <div class="empty-state">جاري تحميل الطلبات...</div>
 </div>
+
+@include('shared.pagination')
 @endsection
 
 @push('scripts')
@@ -59,14 +61,15 @@
     let allReturns = [];
     let currentStatus = 'all';
 
-    async function fetchReturns() {
+    async function fetchReturns(page = 1) {
         try {
-            const response = await fetch('/api/warehouse/store-returns', {
+            const response = await fetch(`/api/warehouse/store-returns?page=${page}`, {
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
             });
             const result = await response.json();
             allReturns = result.data?.data || result.data || [];
             renderReturns();
+            updatePagination(result.data);
         } catch (error) {
             document.getElementById('returnsList').innerHTML = '<div class="empty-state">⚠️ خطأ في تحميل البيانات</div>';
         }
@@ -76,7 +79,7 @@
         currentStatus = status;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderReturns();
+        fetchReturns(1);
     }
 
     function renderReturns() {
@@ -117,7 +120,7 @@
                         </div>
                         <div>
                             <div class="info-label">المبلغ</div>
-                            <div class="amount-display">${parseFloat(ret.total_amount).toFixed(2)} ريال</div>
+                            <div class="amount-display">${parseFloat(ret.total_amount).toFixed(2)} دينار</div>
                         </div>
                         <div>
                             <div class="info-label">الحالة</div>
