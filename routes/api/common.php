@@ -9,10 +9,18 @@ use App\Http\Controllers\Api\UserController;
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/stores', [StoreController::class, 'index']);
-    Route::post('/products', [ProductController::class, 'store']);
-    Route::put('/products/{id}', [ProductController::class, 'update']);
     
-    Route::post('/stores', [StoreController::class, 'store']);
+    // Products Management (admin only)
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/products', [ProductController::class, 'store']);
+        Route::put('/products/{id}', [ProductController::class, 'update']);
+    });
+    
+    // Stores Management (admin only)
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/stores', [StoreController::class, 'store']);
+    });
+    
     Route::get('/stores/{id}/debt', [StoreController::class, 'getDebt']);
     
     // Users management (admin only)

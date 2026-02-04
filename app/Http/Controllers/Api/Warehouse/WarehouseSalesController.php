@@ -8,14 +8,37 @@ use Illuminate\Support\Facades\DB;
 
 class WarehouseSalesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $invoices = DB::table('sales_invoices')
             ->join('users', 'sales_invoices.marketer_id', '=', 'users.id')
             ->join('stores', 'sales_invoices.store_id', '=', 'stores.id')
-            ->select('sales_invoices.*', 'users.full_name as marketer_name', 'stores.name as store_name')
-            ->orderBy('sales_invoices.created_at', 'desc')
-            ->get();
+            ->select('sales_invoices.*', 'users.full_name as marketer_name', 'stores.name as store_name');
+
+        // Filter by status
+        if ($request->has('status')) {
+            $invoices->where('sales_invoices.status', $request->status);
+        }
+
+        // Filter by marketer
+        if ($request->has('marketer_id')) {
+            $invoices->where('sales_invoices.marketer_id', $request->marketer_id);
+        }
+
+        // Filter by store
+        if ($request->has('store_id')) {
+            $invoices->where('sales_invoices.store_id', $request->store_id);
+        }
+
+        // Filter by date range
+        if ($request->has('from_date')) {
+            $invoices->whereDate('sales_invoices.created_at', '>=', $request->from_date);
+        }
+        if ($request->has('to_date')) {
+            $invoices->whereDate('sales_invoices.created_at', '<=', $request->to_date);
+        }
+
+        $invoices = $invoices->orderBy('sales_invoices.created_at', 'desc')->get();
 
         return response()->json(['message' => 'قائمة فواتير البيع', 'data' => $invoices]);
     }

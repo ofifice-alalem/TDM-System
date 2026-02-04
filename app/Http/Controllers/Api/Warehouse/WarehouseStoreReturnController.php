@@ -19,8 +19,27 @@ class WarehouseStoreReturnController extends Controller
         $query = SalesReturn::with(['store:id,name', 'marketer:id,full_name', 'salesInvoice:id,invoice_number', 'keeper:id,full_name'])
             ->orderBy('created_at', 'desc');
 
+        // Filter by status
         if ($request->has('status')) {
             $query->where('status', $request->status);
+        }
+
+        // Filter by marketer
+        if ($request->has('marketer_id')) {
+            $query->where('marketer_id', $request->marketer_id);
+        }
+
+        // Filter by store
+        if ($request->has('store_id')) {
+            $query->where('store_id', $request->store_id);
+        }
+
+        // Filter by date range
+        if ($request->has('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->has('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
         }
 
         $returns = $query->get();

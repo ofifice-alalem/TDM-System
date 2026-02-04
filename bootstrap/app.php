@@ -25,5 +25,31 @@ return Application::configure(basePath: dirname(__DIR__))
         ], 401)));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException $e, $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json([
+                    'message' => 'الطريقة غير مسموحة',
+                    'error' => 'Method Not Allowed'
+                ], 405);
+            }
+        });
+
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json([
+                    'message' => 'المورد غير موجود',
+                    'error' => 'Not Found'
+                ], 404);
+            }
+        });
+
+        $exceptions->render(function (\Throwable $e, $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
+                return response()->json([
+                    'message' => 'حدث خطأ. يرجى المحاولة لاحقاً',
+                    'error' => 'Server Error'
+                ], $statusCode >= 400 && $statusCode < 600 ? $statusCode : 500);
+            }
+        });
     })->create();

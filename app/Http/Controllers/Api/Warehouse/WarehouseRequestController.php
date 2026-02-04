@@ -16,9 +16,27 @@ class WarehouseRequestController extends Controller
     {
         $requests = DB::table('marketer_requests')
             ->join('users', 'marketer_requests.marketer_id', '=', 'users.id')
-            ->select('marketer_requests.*', 'users.full_name as marketer_name')
-            ->orderBy('marketer_requests.created_at', 'desc')
-            ->get();
+            ->select('marketer_requests.*', 'users.full_name as marketer_name');
+
+        // Filter by status
+        if ($request->has('status')) {
+            $requests->where('marketer_requests.status', $request->status);
+        }
+
+        // Filter by marketer
+        if ($request->has('marketer_id')) {
+            $requests->where('marketer_requests.marketer_id', $request->marketer_id);
+        }
+
+        // Filter by date range
+        if ($request->has('from_date')) {
+            $requests->whereDate('marketer_requests.created_at', '>=', $request->from_date);
+        }
+        if ($request->has('to_date')) {
+            $requests->whereDate('marketer_requests.created_at', '<=', $request->to_date);
+        }
+
+        $requests = $requests->orderBy('marketer_requests.created_at', 'desc')->get();
 
         return response()->json([
             'message' => 'قائمة طلبات المسوقين',
